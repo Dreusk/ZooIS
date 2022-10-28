@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="300mm" height="210mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 30000 21000"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#FAFF17;fill-opacity:0.360784}
+    .fil0 {fill:url(#id0)}
+   ]]>
+  </style>
+  <radialGradient id="id0" gradientUnits="objectBoundingBox" cx="15%" cy="150%" r="50%" fx="15%" fy="150%">
+   <stop offset="0" style="stop-color:#EBE65C"/>
+   <stop offset="0.611765" style="stop-color:#D6E2A9"/>
+   <stop offset="1" style="stop-color:#C1DEF5"/>
+  </radialGradient>
+ </defs>
+ <g id="Слой_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <polygon class="fil0" points="30,-48 30030,-48 30030,20952 30,20952 "/>
+  <g id="_606236192">
+   <polygon class="fil1" points="30,17579 1696,10124 1777,18019 7699,12796 3124,19232 10985,18488 3659,20952 30,20952 "/>
+  </g>
+ </g>
+</svg>

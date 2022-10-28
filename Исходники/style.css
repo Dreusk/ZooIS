@@ -1,0 +1,12 @@
+body {
+    background-image: url("Бэкграунд.svg");
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+.content {
+    text-align: center;
+    margin-top: 3em;
+    color: cornflowerblue;
+    text-shadow: 1px 1px 1px black;
+}

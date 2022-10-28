@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+@{
+    string returnUrl = Context.Request.Path.ToUriComponent();
+}
+
+<div class="text-center">
+    <h1 class="display-4">ЗууИС</h1>
+    <p class="text-muted">Мы ответствены за жизнь.</p>
+    <span class="text-danger">Вы не авторизированы! Пожалуйста,  <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">авторизируйтесь.</a></span>
+</div>
