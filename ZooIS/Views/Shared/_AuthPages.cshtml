@@ -1,13 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims;
 @using ZooIS.Data
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
 @{
     string CurrentPage = ViewData["Title"].ToString();
     List<string> UserRoles = Context.User.Claims.Where(e => e.Type == ClaimTypes.Role).Select(e => e.Value).ToList();
-    List<Page> UserPages = Page.AllPages.Where(page => page.Access.Any(role => UserRoles.Contains(role))).ToList();
+    List<Page> UserPages = Page.AllPages.Where(page => page.VisibleFor.Union(UserRoles).Count() > 0).ToList();
 }
 
 <ul class="navbar-nav">

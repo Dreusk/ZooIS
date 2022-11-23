@@ -1,0 +1,29 @@
+﻿@{
+    Dictionary<string, IEntity> Params = (Dictionary<string, IEntity>)ViewData["Params"];
+    Taxon? Species = (Taxon)Params["Вид"];
+    Ref<IEntity>? SpeciesRef = Species is not null ? new(Species) : null;
+    HierarchyCombobox.Params SpeciesInput = new() {
+        Flags = new()
+        {
+            isSearchable = true,
+            isMultiselectable = false,
+        },
+        Title = "Вид",
+        Name = "Species",
+        Placeholder = "Выберите вид...",
+        Value = SpeciesRef is not null ? new() { SpeciesRef } : new(),
+        Url = "/Taxons/get_hierarchy",
+        SearchParams = new() {
+            { "level", TaxonRank.Family }
+        }
+    };
+}
+
+@using ZooIS.Data
+@using ZooIS.Components
+
+<div class="row">
+	<div class="col-6">
+		@await Component.InvokeAsync("HierarchyCombobox", SpeciesInput)
+	</div>
+</div>

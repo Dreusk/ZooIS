@@ -1,0 +1,15 @@
+﻿@model List<Page>
+
+@{
+    string Controller = (string)Context.Request.RouteValues["Controller"];
+}
+
+<ul class="navbar-nav">
+    @foreach (Page Page in Model) {
+        <li>
+            <a class="nav-link text-dark @if(Controller == Page.Controller){ @Html.Raw("font-weight-bold") }"
+            asp-controller=@Page.Controller asp-action="Index">
+            @Page.Display</a>
+        </li>
+    }
+</ul>

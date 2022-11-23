@@ -1,0 +1,27 @@
+﻿@model User?
+
+@using ZooIS.Data;
+
+@{
+    bool isDebug = Boolean.Parse(Context.User.Claims.FirstOrDefault(e => e.Type == "isDebug")?.Value ?? "false");
+}
+
+<link rel="stylesheet" href="/css/Components/UserComponent.css">
+@if (isDebug) {
+    <script defer src="/js/Components/UserComponent.js"></script>
+}
+<div class="user-wrap">
+    @if (isDebug)
+    {
+        <div tabindex="0" class="trigger">
+            <span class="nav-link text-dark">@Model?.Display</span>
+        </div>
+        <div class="expand-block">
+            <ul>
+        </ul>
+    </div>
+    }
+    else {
+        <span class="nav-link text-dark no-select">@Model?.Display</span>
+    }
+</div>

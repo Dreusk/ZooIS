@@ -1,0 +1,18 @@
+@model string
+
+@using ZooIS.Components
+
+@{ 
+    string q = Context.Request.Query["q"].ToString();
+}
+
+<link rel="stylesheet" href="/css/Components/SearchInput.css">
+<script defer src="/js/Components/SearchInput.js"></script>
+
+<div class="search-input">
+    <div class="search">
+        <input form="search" name="q" type="text" placeholder="Ищите по имени..." value="@q" />
+        <button class="clear" type="button">X</button>
+        <button class="send" type="button">Поиск</button>
+    </div>
+</div>

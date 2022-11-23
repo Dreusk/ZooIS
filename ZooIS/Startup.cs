@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,9 +13,12 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ZooIS.Controllers;
 using ZooIS.Data;
+using ZooIS.Models;
 
 namespace ZooIS
 {
@@ -35,12 +39,39 @@ namespace ZooIS
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddRoles<IdentityRole>()
+            services.AddDefaultIdentity<User>()
+                .AddRoles<Role>()
                 .AddEntityFrameworkStores<ZooISContext>();
-            services.AddControllersWithViews(options => {
-                options.Filters.Add(typeof(LogFilter));
-                options.Filters.Add(typeof(TitleFilter));
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AccessToRoles", policy =>
+                {
+                    policy.RequireClaim("AccessToRoles", "true");
+                });
+                options.AddPolicy("AccessToUsers", policy =>
+                {
+                    policy.RequireClaim("AccessToUsers", "true");
+                });
+            });
+
+            services
+                .AddControllersWithViews(options =>
+                {
+                    options.Filters.Add(typeof(LogFilter));
+                    options.Filters.Add(typeof(TitleFilter));
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                });
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 1;
             });
 
             services.AddRazorPages();

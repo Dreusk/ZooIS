@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using ZooIS.Data;
+using ZooIS.Data.Migrations;
 using ZooIS.Models;
 
 namespace ZooIS.Controllers
@@ -16,30 +22,62 @@ namespace ZooIS.Controllers
     {
         private readonly ZooISContext _context;
 
-        public AnimalsController(ZooISContext context)
+        public AnimalsController(ZooISContext context) => _context = context;
+
+        [Ignore]
+        [HttpGet]
+        public async Task<List<Animal>> get(string? q, Guid? species, int page = 1)
         {
-            _context = context;
+            q = q?.ToLower();
+            Taxon? rootTaxon = species is null ? null :
+                await _context.Taxons.FindAsync(species);
+            HashSet<Taxon>? Taxons = species is null ? null :
+                (await rootTaxon.GetSpecies(_context)).ToHashSet();
+            return await _context.Animals.AsQueryable()
+                          .Where(e => q == null || e.Name.ToLower().Contains(q))
+                          .Include(e => e.Species)
+                          .Where(e => species == null || Taxons.Select(e => e.Guid).Contains(e.SpeciesGuid))
+                          .OrderBy(e => e.Name)
+                          .Skip((page - 1) * 18)
+                          .Take(18)
+                          .ToListAsync();
         }
 
-        // GET: Animals
+        [Ignore]
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<List<Ref<Animal>>> getRefs(string? q, Guid? species, int page = 1)
         {
-            var applicationDbContext = _context.Animal.Include(a => a.Species);
-            return View(await applicationDbContext.ToListAsync());
+            return (await get(q, species, page))
+                .Select(e => new Ref<Animal>(e))
+                .ToList();
         }
 
-        // GET: Animals/Details/5
         [HttpGet]
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Index(string? q, Guid? species, int page = 1)
+        {
+            List<Animal> Animals = await get(q, species, page);
+            Taxon? rootTaxon = species is null ? null :
+                await _context.Taxons.FindAsync(species);
+            ViewData["Page"] = page;
+            ViewData["Params"] = new Dictionary<string, IEntity>
+            {
+                { "Вид", rootTaxon }
+            };
+            return View(Animals);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Show(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var animal = await _context.Animal
+            var animal = await _context.Animals
                 .Include(a => a.Species)
+                .Include(a => a.Parents)
+                .Include(a => a.Children)
                 .FirstOrDefaultAsync(m => m.Guid == id);
             if (animal == null)
             {
@@ -49,30 +87,33 @@ namespace ZooIS.Controllers
             return View(animal);
         }
 
-        // GET: Animals/Create
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Crud(Guid? id)
         {
-            ViewData["SpeciesGuid"] = new SelectList(_context.Species, "Guid", "ScientificName");
-            return View();
+            Animal? Animal = id != null ? await _context.Animals.FindAsync(id) : null;
+            ViewBag.Sex = Enum.GetValues<Sex>().Select(E => E.GetRef()).ToList();
+            return View(Animal);
         }
 
-        // POST: Animals/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nickname,Age,BirthDate,SpeciesGuid,Sex,Guid")] Animal animal)
+        public async Task<IActionResult> Crud()
         {
-            if (ModelState.IsValid)
-            {
-                animal.Guid = Guid.NewGuid();
-                _context.Add(animal);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["SpeciesGuid"] = new SelectList(_context.Species, "Guid", "ScientificName", animal.SpeciesGuid);
-            return View(animal);
+            Animal Animal = new();
+            var Form = Request.Form;
+            if (Form["Id"] != "")
+                Animal = await _context.Animals.FindAsync(new Guid(Form["Id"]));
+            else
+                _context.Animals.Add(Animal);
+            Animal.SpeciesGuid = new Guid(Form["Species"]);
+            Animal.Name = Form["Name"];
+            Animal.Sex = new(Enum.Parse<Sex>(Form["Sex"]));
+            foreach (var ParentGuid in Form["Parents"].Select(id => new Guid(id)))
+                Animal.Parents.Add(await _context.Animals.FindAsync(ParentGuid));
+            Animal.BirthDate = Form["BirthDate"] != "" ? DateTime.Parse(Form["BirthDate"]) : null;
+            await _context.SaveChangesAsync();
+            ViewBag.Sex = Enum.GetValues<Sex>().Select(E => E.GetRef()).ToList();
+			return RedirectToAction("Show", "Animals", Animal.Guid);
         }
 
         // GET: Animals/Edit/5
@@ -84,12 +125,12 @@ namespace ZooIS.Controllers
                 return NotFound();
             }
 
-            var animal = await _context.Animal.FindAsync(id);
+            var animal = await _context.Animals.FindAsync(id);
             if (animal == null)
             {
                 return NotFound();
             }
-            ViewData["SpeciesGuid"] = new SelectList(_context.Species, "Guid", "ScientificName", animal.SpeciesGuid);
+            ViewData["TaxonsGuid"] = new SelectList(_context.Taxons, "Guid", "ScientificName", animal.SpeciesGuid);
             return View(animal);
         }
 
@@ -98,7 +139,7 @@ namespace ZooIS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Nickname,Age,BirthDate,SpeciesGuid,Sex,Guid")] Animal animal)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Nickname,Age,BirthDate,TaxonsGuid,Sex,Guid")] Animal animal)
         {
             if (id != animal.Guid)
             {
@@ -125,7 +166,7 @@ namespace ZooIS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SpeciesGuid"] = new SelectList(_context.Species, "Guid", "ScientificName", animal.SpeciesGuid);
+            ViewData["TaxonsGuid"] = new SelectList(_context.Taxons, "Guid", "ScientificName", animal.SpeciesGuid);
             return View(animal);
         }
 
@@ -138,7 +179,7 @@ namespace ZooIS.Controllers
                 return NotFound();
             }
 
-            var animal = await _context.Animal
+            var animal = await _context.Animals
                 .Include(a => a.Species)
                 .FirstOrDefaultAsync(m => m.Guid == id);
             if (animal == null)
@@ -154,15 +195,15 @@ namespace ZooIS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var animal = await _context.Animal.FindAsync(id);
-            _context.Animal.Remove(animal);
+            var animal = await _context.Animals.FindAsync(id);
+            _context.Animals.Remove(animal);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool AnimalExists(Guid id)
         {
-            return _context.Animal.Any(e => e.Guid == id);
+            return _context.Animals.Any(e => e.Guid == id);
         }
     }
 }

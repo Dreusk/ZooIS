@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Alert>
+
+<div class="flex-row">
+    <h1>
+        @ViewData["Title"].ToString()
+        <a asp-action="Create" class="ml-2" title="Зарегистрировать новое">+</a>
+    </h1>
+</div>
+
+<link rel="stylesheet" href="~/css/Alerts/Index.css" />
+<script defer src="~/js/Alerts/Index.js"></script>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Level)</th>
+            <th>@Html.DisplayNameFor(model => model.Type)</th>
+            <th>@Html.DisplayNameFor(model => model.Message)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(Alert item in Model) {
+        <tr id=@($"id{item.Key}") class="@if(item.isRead) { Html.Raw("text-muted"); }">
+            <td>@Html.DisplayFor(model => item.Level)</td>
+            <td>@Html.DisplayFor(model => item.Type)</td>
+            <td>@Html.DisplayFor(model => item.Message)</td>
+            <td>
+                @if (!item.isRead)
+                {
+                    <button>
+                        Отметить
+                    </button>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

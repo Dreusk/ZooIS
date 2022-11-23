@@ -1,0 +1,7 @@
+@{
+    var ReportInput = (HierarchyCombobox.Params)ViewBag.ReportInput;
+}
+
+@using ZooIS.Components
+
+@await Component.InvokeAsync("HierarchyCombobox", ReportInput)

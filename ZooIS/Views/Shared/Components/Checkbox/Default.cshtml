@@ -1,0 +1,11 @@
+﻿@model Checkbox.Params
+
+@using ZooIS.Components;
+
+<link rel="stylesheet" href="~/css/Components/Checkbox.css" />
+<script defer src="~/js/Components/Checkbox.js"></script>
+<div class="checkbox-wrap">
+    <input name="@Model.Name" id="@Model.Name" type="checkbox" value="true" checked=@Model.isChecked tabindex="-1" />
+    <div class="checkbox" tabindex="0"></div>
+    <label for="@Model.Name">@Model.Label</label>
+</div>

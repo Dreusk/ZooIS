@@ -1,0 +1,159 @@
+.combobox-wrap {
+    position: relative;
+}
+
+.combobox-wrap .search-wrap {
+    display: flex;
+    background: white;
+    border: 1px solid black;
+    border-radius: 9px;
+    padding-left: 9px;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.combobox-wrap .search-wrap.active {
+    border-color: orange;
+    outline: 1px solid orange;
+}
+
+.combobox-wrap .search-wrap.active[disabled="true"] {
+    border-color: grey !important;
+    outline: none;
+}
+
+.combobox-wrap .search-wrap select {
+    display: none;
+    width: 0;
+    border: none;
+    outline: none;
+}   
+
+.combobox-wrap .search-wrap .display {
+    flex-grow: 1;
+}
+
+.combobox-wrap .search-wrap .clear {
+    border-radius: 9px;
+    width: 2rem;
+    background-color: orangered;
+    border-width: 0 0 0 1px;
+}
+
+.combobox-wrap .search-wrap .clear:focus, .search-wrap .clear:hover {
+    border-color: orange;
+    outline: 3px solid orange;
+}
+
+.combobox-wrap .search-wrap .clear:active {
+    background-color: red;
+}
+
+.combobox-wrap .search-wrap[disabled="true"] .clear:active {
+    background-color: orangered;
+}
+
+.combobox-wrap .expand-block {
+    position: absolute;
+    width: 100%;
+    border: 1px solid black;
+    border-top: none;
+    border-radius: 9px;
+    background-color: lightcyan;
+    box-shadow: 0px 0.25rem 9px grey;
+    padding: 0.5rem 0;
+}
+
+.combobox-wrap .search-wrap .placeholder {
+    flex-grow: 1;
+    color: gray;
+}
+
+.combobox-wrap .expand-block .container {
+    border-radius: 9px;
+}
+
+.combobox-wrap .expand-block input {
+    width: 100%;
+    border-radius: 9px;
+    padding-left: 0.25rem;
+}
+
+.combobox-wrap .expand-block input:focus, .expand-block input:hover {
+    border: 2px solid orange;
+    outline: none;
+}
+
+.combobox-wrap ul {
+    margin: 0;
+    padding: 0;
+    border-radius: 9px;
+}
+
+.combobox-wrap li {
+    border-top: 1px solid grey;
+    border-bottom: 1px solid white;
+    background-color: white;
+    border-radius: 9px;
+    display: flex;
+    list-style-type: none;
+}
+
+.combobox-wrap .container > ul > div:first-child > li {
+    border-top-color: white;
+}
+
+.combobox-wrap li .pad {
+    display: flex;
+    cursor: pointer;
+    border: 1px solid white;
+    border-radius: 9px;
+}
+
+.combobox-wrap li .pad:has(.empty) {
+    cursor: initial;
+}
+
+.combobox-wrap li .empty, .combobox-wrap li .none {
+    min-width: 1rem;
+}
+
+.combobox-wrap li img {
+    width:  1rem;
+    height: 1rem;
+}
+
+.combobox-wrap li .collapsed, .combobox-wrap li .expanded {
+    cursor: pointer;
+}
+
+.combobox-wrap li .display {
+    flex-grow: 1;
+    padding-left: 9px;
+    border: 1px solid white;
+    border-radius: 9px;
+    user-select: none;
+}
+
+.combobox-wrap .expand-block li .display {
+    padding-left: 0.25rem;
+    cursor: pointer;
+}
+
+.combobox-wrap .expand-block li:has(.display.selected) {
+    background-color: lightgoldenrodyellow;
+}
+
+.combobox-wrap .expand-block li:has(.display.selected) > * {
+    border-color: lightgoldenrodyellow;
+}
+
+.combobox-wrap .expand-block li .pad:not(:has(.empty)):hover, .combobox-wrap li .pad:has(*:focus-visible), .combobox-wrap li .display:hover, .combobox-wrap li .display:focus-visible {
+    border-color: orange;
+    outline: 2px solid orange;
+}
+
+.combobox-wrap li .pad *:focus-visible {
+    border: none;
+    outline: none;
+}

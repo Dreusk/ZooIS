@@ -1,0 +1,40 @@
+﻿@model string
+
+@using ZooIS.Components
+
+@{
+    string q = Context.Request.Query["q"].ToString();
+    Dictionary<string, IEntity> Params = (Dictionary<string, IEntity>)ViewData["Params"];
+}
+
+<link rel="stylesheet" href="/css/Components/IndexSearch.css">
+<script defer src="/js/Components/IndexSearch.js"></script>
+
+<form id="search" method="get">
+    <div class="search-wrap">
+        <div class="search">
+            <input form="search" name="q" type="text" placeholder="Ищите по имени..." value="@q" />
+            <button class="clear" type="button">X</button>
+            <button class="expand" type="button">*</button>
+            <button class="send" type="submit">Поиск</button>
+        </div>
+        <div class="search-form">
+            @await Html.PartialAsync(@Model)
+            <div class="w-100 d-flex justify-content-end">
+                <button class="send" type="submit">Поиск</button>
+            </div>
+        </div>
+        <div class="chips-set">
+            <div class="container">
+                @foreach (var param in Params) {
+                    if (param.Value is not null) {
+                        <div class="chip">
+                            <span class="text-muted">@param.Key:</span>
+                            <span>@param.Value.Display</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</form>

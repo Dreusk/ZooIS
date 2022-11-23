@@ -1,0 +1,105 @@
+﻿@model ZooIS.Models.Animal?
+
+@using ZooIS.Data
+@using ZooIS.Components
+
+@{
+    Ref<IEntity>? SpeciesRef = null;
+    HierarchyCombobox.Params SpeciesInput = new()
+    {
+        Flags = new()
+        {
+            isSearchable = true,
+            isMultiselectable = false,
+            isRequired = true
+        },
+        Title = "Вид",
+        Name = "Species",
+        Placeholder = "Выберите вид...",
+        Value = SpeciesRef is not null ? new() { SpeciesRef } : new(),
+        Url = "/Taxons/get_hierarchy",
+        SearchParams = new()
+        {
+            { "level", TaxonRank.Species }
+        }
+    };
+
+    HierarchyCombobox.Params SexInput = new()
+    {
+        Flags = new()
+        {
+            isRequired = true
+        },
+        Title = "Пол",
+        Name = "Sex",
+        Items = ViewBag.Sex,
+        Placeholder = "",
+    };
+
+    HierarchyCombobox.Params ParentsInput = new()
+    {
+        Flags = new()
+        {
+            isSearchable = true,
+            isMultiselectable = true
+        },
+        Title = "Родители",
+        Name = "Parents",
+        DisabledPlaceholder = "Выберите вид",
+        MaxCount = 2,
+        Url = "/Animals/getRefs",
+        SearchParams = new() { },
+        Dependencies = new() { "Species" }
+
+    };
+}
+
+<link rel="stylesheet" href="~/css/Animals/Crud.css" />
+<script defer src="/js/Animal/Crud.js"></script>
+
+<h1>Регистрация</h1>
+
+<h4>Животного</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Crud">
+            <input type="hidden" name="Id" id="Id" value="@Model?.Guid" />
+            <div class="form-group">
+                <label for="Photo">Фото</label>
+                <input type="file" accept="image/*" name="Photo" id="Photo" />
+            </div>
+            <div class="form-group">
+                @await Component.InvokeAsync("HierarchyCombobox", SpeciesInput)
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="required"></label>
+                <input asp-for="Name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @await Component.InvokeAsync("HierarchyCombobox", SexInput)
+            </div>
+            <div class="form-group">
+                @await Component.InvokeAsync("HierarchyCombobox", ParentsInput)
+            </div>
+            <div class="form-group">
+                <label asp-for="BirthDate"></label>
+                <input asp-for="BirthDate" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <button type="submit">Сохранить</button>
+                </div>
+                <div class="ml-2">
+                    <a asp-action="Index">Назад</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@*@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}*@

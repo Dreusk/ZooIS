@@ -1,0 +1,65 @@
+﻿@model HierarchyCombobox.Params
+
+@using ZooIS.Components;
+
+<link rel="stylesheet" href="/css/Components/HierarchyCombobox.css" />
+<script defer src="/js/Components/HierarchyCombobox.js">
+	@Json.Serialize(Model)
+</script>
+
+<div class="combobox-wrap">
+	<label for="@Model.Name" class="@(Model.Flags.isRequired ? "required" : "")">@Model.Title</label>
+	@if (Model.Flags.isMultiselectable)
+	{
+		<ul>
+			@foreach (var item in Model.Value) {
+				<li>
+					<div class="dsiplay">
+						@item.Display
+					</div>
+				</li>
+			}
+		</ul>
+	}
+	<div tabindex="0" class="search-wrap">
+		<select name="@Model.Name" id="@Model.Name"
+		readonly
+		class="@(Model.Flags.isRequired ? "valid" : null)"
+		data-val="@(Model.Flags.isRequired ? "true" : null)"
+		data-val-required="@(Model.Flags.isRequired ? "Обязательное поле." : null)"
+		aria-describedby="@(Model.Flags.isRequired ? $"{Model.Name}-error" : null)"
+		aria-invalid="false">
+			@if (Model.Value.Count > 0)
+			{
+				foreach (var Item in Model.Value)
+				{
+					<option value=@Item.Id></option>
+				}
+			}
+		</select>
+		@if (!Model.Flags.isMultiselectable && Model.Value.Count > 0) {
+			<div class="display">
+				@Model.Value[0].Display
+			</div>
+		}
+		<div class="placeholder">@Model.Placeholder.</div>
+		<button class="clear" type="button">X</button>
+	</div>
+	<div class="expand-block">
+		@if (Model.Flags.isSearchable) {
+			@await Component.InvokeAsync("SearchInput");
+		}
+		<div class="container">
+			<ul>
+				@foreach(var item in Model.Items)
+				{
+					<li id="@item.Id">@item.Display</li>
+				}
+			</ul>
+		</div>
+	</div>
+	@if (true)
+	{
+		<span class="text-danger field-validation-valid" data-valmsg-for="@Model.Name" data-valmsg-replace="true"></span>
+	}
+</div>

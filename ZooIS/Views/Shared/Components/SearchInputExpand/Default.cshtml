@@ -1,0 +1,27 @@
+﻿@model string
+
+@using ZooIS.Components
+
+@{ 
+    string q = Context.Request.Query["q"].ToString();
+}
+
+<link rel="stylesheet" href="/css/Components/SearchInputExpand.css">
+<script defer src="/js/Components/SearchInputExpand.js"></script>
+
+<form id="search" method="get">
+    <div class="search-wrap">
+        <div class="search">
+            <input form="search" name="q" type="text" placeholder="Ищите по имени..." value="@q" />
+            <button class="clear" type="button">X</button>
+            <button class="expand" type="button">*</button>
+            <button class="send" type="submit">Поиск</button>
+        </div>
+        <div class="search-form">
+            @await Html.PartialAsync(@Model)
+            <div class="w-100 d-flex justify-content-end">
+                <button class="send" type="submit">Поиск</button>
+            </div>
+        </div>
+    </div>
+</form>

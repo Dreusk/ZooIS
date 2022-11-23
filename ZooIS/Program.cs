@@ -17,8 +17,7 @@ namespace ZooIS
         {
             var host = CreateHostBuilder(args).Build();
             var services = host.Services.CreateScope().ServiceProvider;
-            Initializer.Initialize(services);
-            Initializer.InitializeIdentity(services);
+            Initializer.Initialize(services).ConfigureAwait(false);
             host.Run();
         }
 

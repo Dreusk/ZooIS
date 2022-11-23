@@ -1,0 +1,21 @@
+@model GeneologyParams
+
+@{
+	bool isBlocked = (bool)ViewBag.isBlocked;
+    var ReportInput = (HierarchyCombobox.Params)ViewBag.ReportInput;
+}
+
+@using ZooIS.Components
+
+@await Component.InvokeAsync("HierarchyCombobox", ReportInput)
+
+<form method="POST">
+	<div class="form-group">
+		<label asp-for="Animal"></label>
+		<input asp-for="Animal" />
+	</div>
+	<div class="form-group"
+		disabled="@(isBlocked ? "true" : null)#>
+		<button type="submit">Заказать</button>
+	</div>
+</form>

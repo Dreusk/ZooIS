@@ -1,30 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
+using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
+using ZooIS.Models;
+using System.Runtime.CompilerServices;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ZooIS.Data
 {
-    public struct Page
+    //Extensions
+    public static class EnumExtensions
     {
-        public string Controller { get; set; }
-        /// <summary>
-        /// A localized name
-        /// </summary>
-        public string Display { get; set; }
-        /// <summary>
-        /// A list of roles that have access to this page.
-        /// </summary>
-        [Display(Name = "Доступ")]
-        public List<string> Access { get; set; }
+        public static Ref<Concept<TEnum>.EEnum> GetRef<TEnum> (this TEnum Enum) where TEnum: Enum => new Concept<TEnum>(Enum);
 
-        /// <summary>
-        /// List of all pages currently present in project.
-        /// </summary>
-        public static readonly List<Page> AllPages = new(){
-        new(){
-            Controller = "Animals",
-            Display = "Животные",
-            Access = new List<string>{"Caretaker"}
-        }};
+        public static string GetDisplay<T> (this T Enum) where T: Enum
+        {
+            return Enum.GetType()
+                    .GetMember(Enum.ToString())
+                    .First()
+                    .GetCustomAttribute<DisplayAttribute>()
+                    .GetName();
+        }
     }
+
+    //Attributes
+    /// <summary>
+    /// Tells filters to ignore this controller or action.
+    /// </summary>
+    public class Ignore : Attribute { }
 }

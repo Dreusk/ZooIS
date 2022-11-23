@@ -1,0 +1,89 @@
+﻿@model ZooIS.Models.Animal
+
+@using ZooIS.Data
+
+@{
+    Func<Animal, string> GetParentRelation = (parent) =>
+    {
+        switch (parent.SexId)
+        {
+            case Sex.Male:
+                return "Отец";
+            case Sex.Female:
+                return "Мать";
+            case Sex.Undetermined:
+                return "Неизвестно?";
+            default:
+                return "";
+        }
+    };
+}
+
+<link rel="stylesheet" href="~/css/Animals/Show.css" />
+
+<h1>@ViewData["Title"].ToString().Split(" - ").First()</h1>
+
+<div>
+    <hr />
+    <h4>@Model.Name</h4>
+    <img src="@Model.PicturePath" title="@Model.Display" />
+    <dl>
+        <dt>Общие данные</dt>
+        <dd>
+            <table>
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(e => e.Species)</th>
+                        <th>@Html.DisplayNameFor(e => e.Age)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <a asp-controller="Taxons" asp-action="Show" asp-route-id="@Model.Species.Key">
+                                @Model.Species.Display
+                            </a>
+                        </td>
+                        <td>@(Model.Age?.Year.ToString() ?? "Неизвестен")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Parents)</dt>
+        <dd>
+            <ul>
+                @foreach (var parent in Model.Parents.OrderBy(e => e.Display))
+                {
+                    <li>
+                        <a asp-route-id="@parent.Key">@parent.Display</a>
+                        <span class="text-muted no-select">(@GetParentRelation(parent))</span>
+                    </li>
+                }
+                @if (Model.Parents.Count() == 0)
+                {
+                    <li>
+                        <span class="text-muted">Известные родители отсутствуют</span>
+                    </li>
+                }
+            </ul>
+        </dd>
+        <dt>@Html.DisplayNameFor(model => model.Children)</dt>
+        <dd>
+            <ul>
+                @foreach (var child in Model.Children.OrderBy(e => e.Display))
+                {
+                    <li>
+                        <a asp-route-id="@child.Key">@child.Display</a>
+                    </li>
+                }
+                @if (Model.Children.Count() == 0)
+                {
+                    <li>
+                        <span class="text-muted">Известные дети отсутствуют</span>
+                    </li>
+                }
+            </ul>
+        </dd>
+    </dl>
+</div>

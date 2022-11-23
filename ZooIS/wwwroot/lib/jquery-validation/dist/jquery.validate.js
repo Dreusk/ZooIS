@@ -35,6 +35,7 @@ $.extend( $.fn, {
 			return validator;
 		}
 
+
 		// Add novalidate tag if HTML5.
 		this.attr( "novalidate", "novalidate" );
 
@@ -44,7 +45,6 @@ $.extend( $.fn, {
 		if ( validator.settings.onsubmit ) {
 
 			this.on( "click.validate", ":submit", function( event ) {
-
 				// Track the used submit button to properly handle scripted
 				// submits later.
 				validator.submitButton = event.currentTarget;
@@ -282,7 +282,7 @@ $.extend( $.validator, {
 		errorContainer: $( [] ),
 		errorLabelContainer: $( [] ),
 		onsubmit: true,
-		ignore: ":hidden",
+		ignore: [],
 		ignoreTitle: false,
 		onfocusin: function( element ) {
 			this.lastActive = element;
@@ -635,7 +635,7 @@ $.extend( $.validator, {
 			// Select all valid inputs inside the form (no submit or reset buttons)
 			return $( this.currentForm )
 			.find( "input, select, textarea, [contenteditable]" )
-			.not( ":submit, :reset, :image, :disabled" )
+			.not( ":submit, :reset, :image" )
 			.not( this.settings.ignore )
 			.filter( function() {
 				var name = this.name || $( this ).attr( "name" ); // For contenteditable

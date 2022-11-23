@@ -1,10 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>aspnet-ZooIS-CA9B715C-3D4A-435B-9208-5BBBE2E4F745</UserSecretsId>
 	<Nullable>annotations</Nullable>
+	<TypeScriptJSXEmit>none</TypeScriptJSXEmit>
+
   </PropertyGroup>
+
+  <PropertyGroup>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Remove="D:\dima\ZooIS\ZooIS\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Controllers\TaxonsController.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.17" />
@@ -17,6 +39,14 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\local\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\dima\ZooIS\ZooIS\.editorconfig" />
   </ItemGroup>
 
 </Project>

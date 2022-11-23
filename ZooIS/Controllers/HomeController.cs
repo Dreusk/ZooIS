@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -26,22 +27,23 @@ namespace ZooIS.Controllers
 
         [Display(Name ="Главная")]
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                string UserId = User.Claims.First(e => e.Type == ClaimTypes.NameIdentifier).Value;
-                List<Log> Logs = _context.Logs
-                    .Where(e => e.UserId == UserId && e.PageTitle != "Главная")
-                    .OrderBy(e => e.ts)
-                    .Take(5)
-                    .AsEnumerable()
-                    .GroupBy(e => e.Url)
-                    .Select(e => e.OrderBy(e => e.ts).First())
-                    .ToList();
-                return View("IndexAuthorized", Logs);
-            }
-            return View("IndexNonAuthorized");
+            if (!User.Identity.IsAuthenticated)
+                return View("IndexNonAuthorized");
+            string UserId = User.Claims.First(e => e.Type == ClaimTypes.NameIdentifier).Value;
+            List<Log> Logs = (await _context.Logs
+                .AsQueryable()
+                .Where(e => e.UserId == UserId && e.PageTitle != "Главная")
+                .OrderByDescending(e => e.ts)
+                .Take(5)
+
+                .ToListAsync())
+                .GroupBy(e => e.Url)
+                .Select(e => e.OrderByDescending(e => e.ts).First())
+                .ToList();
+            return View("IndexAuthorized", Logs);
+            
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

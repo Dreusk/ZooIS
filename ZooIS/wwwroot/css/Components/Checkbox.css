@@ -1,0 +1,35 @@
+﻿.checkbox-wrap {
+    display: flex;
+    position: relative;
+    cursor: pointer;
+}
+
+.checkbox-wrap input {
+    width: 0;
+}
+
+.checkbox-wrap input:hover {
+    border: none;
+    outline: none;
+}
+
+.checkbox-wrap div {
+    position: relative;
+    top: 0.24rem;
+    min-width: 16px;
+    height: 16px;
+    margin-right: 0.3rem;
+    border: 1px solid black ;
+    border-radius: 9px;
+    background-color: white;    
+}
+
+.checkbox-wrap div:hover, .checkbox-wrap div:focus-visible {
+    border: 1px solid orange;
+    outline: 1px solid orange;
+    box-shadow: 0px 0px 3px orange;
+}
+
+.checkbox-wrap div.checked {
+    background-color: yellow;
+}

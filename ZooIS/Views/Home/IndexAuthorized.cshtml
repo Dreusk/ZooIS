@@ -10,13 +10,13 @@
     <h1 class="display-4 text-center">ЗууИС</h1>
     <p class="text-muted text-center">Мы ответствены за жизнь.</p>
     <h2 class="mt-4">Чем вы займетесь сегодня?</h2>
-    <ul class="text-initial">
+    <ul class="text-initial markerless">
         @if (Model.Count > 0)
         {
             @foreach (Log log in Model)
             {
                 <li>
-                    <a href="@log.Url">@log.PageTitle - @log.ts.ToShortTimeString()</a>
+                    <a href="@log.Url">@log.Display</a>
                 </li>
             }
         }

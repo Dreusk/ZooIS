@@ -1,0 +1,45 @@
+﻿.paging {
+    width: fit-content;
+    border: 0px solid grey;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-radius: 9px;
+    margin-bottom: 0.5rem;
+}
+
+.paging input {
+    width: 4em;
+    overflow: hidden;
+}
+
+.card.animal.animated {
+    transform: translate(0%, -1000%);
+    animation: 0s ease-in 0s FlyIn;
+    box-shadow: 0px 0.5rem 1rem grey;
+}
+
+.card.animal {
+    transition: top 0.4s, box-shadow 0.4s;
+    top: 0;
+    box-shadow: none;
+}
+
+.card.animal:hover {
+    top: -2rem;
+    box-shadow: 0px 2rem 1rem grey;
+    z-index: 2;
+}
+
+@keyframes FlyIn {
+    0% {
+        transform: translate(0%, -100vh );
+    }
+
+    60% {
+        transform: translate(0%, 10%);
+    }
+
+    100% {
+        transform: translate(0%, 0%);
+    }
+}

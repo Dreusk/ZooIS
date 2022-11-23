@@ -1,0 +1,107 @@
+.alert-wrap {
+    position: relative;
+    margin-left: 0.25rem;
+}
+
+.alert-wrap .alert {
+    position: relative;
+    top: 0.2rem;
+    padding: 1px;
+}
+
+.alert-wrap .alert img {
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+    filter: invert(74%) sepia(3%) saturate(11%) hue-rotate(322deg) brightness(90%) contrast(93%);
+}
+
+.alert-wrap .alert img.regular {
+    filter: none;
+}
+
+.alert-wrap .alert img.warning {
+    filter: invert(53%) sepia(92%) saturate(358%) hue-rotate(5deg) brightness(99%) contrast(92%);
+}
+
+.alert-wrap .alert img.alert {
+    filter: invert(14%) sepia(83%) saturate(5032%) hue-rotate(357deg) brightness(105%) contrast(80%);
+}
+
+.alert-wrap .expand-block {
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    max-height: 40vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: white;
+    border-radius: 9px;
+    z-index: 1;
+    box-shadow: 0px 0.5rem 9px gray;
+}
+
+.alert-wrap .expand-block ul {
+    padding: 0;
+}
+
+.alert-wrap .expand-block li {
+    padding: 5px;
+    list-style-type: none;
+    border: 1px solid black;
+    border-left-width: 4px;
+    border-top-color: grey;
+    border-bottom-color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+.alert-wrap .expand-block li:hover, .alert-wrap .expand-block li:focus-visible, .alert-wrap .expand-block li:focus-within {
+    outline: none;
+    border-color: orange !important;
+}
+
+.alert-wrap .expand-block li:first-child {
+    border-radius: 9px 9px 0 0;
+}
+
+.alert-wrap .expand-block li:last-child {
+    border-radius: 0 0 9px 9px;
+    border-bottom-color: black;
+    padding: 0;
+}
+
+.alert-wrap .expand-block li a{
+    width: 100%;
+    display: block;
+}
+
+.alert-wrap .expand-block li a:hover, .alert-wrap .expand-block li a:focus-visible{
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.alert-wrap li:has(div.regular) {
+    border-left-color: azure;
+}
+
+.alert-wrap li:has(div.warning) {
+    border-left-color: yellow;
+}
+
+.alert-wrap li:has(div.alert) {
+    border-left-color: orangered;
+}
+
+.alert-wrap li div.info {
+    color: grey
+}
+
+.alert-wrap li div.success {
+    color: greenyellow;
+}
+
+.alert-wrap li div.fail {
+    color: crimson;
+}

@@ -1,0 +1,24 @@
+﻿@model AlertLevel?
+
+@using System.Security.Claims; 
+
+@{
+    string UserId = Context.User.Claims.First(e => e.Type == ClaimTypes.NameIdentifier).Value;
+}
+
+<link rel="stylesheet" href="/css/Components/AlertComponent.css">
+<script defer src="/js/Components/AlertComponent.js"></script>
+<div class="alert-wrap">
+    <div tabindex="0" class="trigger alert ">
+        <img class="@Model?.ToString().ToLower()" src="/static/alert.svg" title="Оповещения" />
+	</div>
+    <div class="expand-block">
+        <ul>
+            <li>
+                <a asp-controller="Alerts" asp-action="Index" asp-route-userId="@UserId">
+                    Просмотреть всё
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
