@@ -16,7 +16,7 @@ namespace ZooIS.Data
     //Extensions
     public static class EnumExtensions
     {
-        public static Ref<Concept<TEnum>.EEnum> GetRef<TEnum> (this TEnum Enum) where TEnum: Enum => new Concept<TEnum>(Enum);
+        public static Ref<IEntity> GetRef<TEnum> (this TEnum Enum) where TEnum: Enum => new Ref<IEntity>(new Concept<TEnum>.EEnum(Enum));
 
         public static string GetDisplay<T> (this T Enum) where T: Enum
         {

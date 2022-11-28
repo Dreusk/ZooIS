@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using ZooIS.Data;
 using ZooIS.Data.Migrations;
 using ZooIS.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ZooIS.Controllers
 {
@@ -21,13 +23,19 @@ namespace ZooIS.Controllers
     public class AnimalsController : Controller
     {
         private readonly ZooISContext _context;
+        private readonly IWebHostEnvironment _enviroment;
 
-        public AnimalsController(ZooISContext context) => _context = context;
+        public AnimalsController(ZooISContext context, IWebHostEnvironment enviroment) {
+            _context = context;
+            _enviroment = enviroment;
+        }
 
         [Ignore]
         [HttpGet]
-        public async Task<List<Animal>> get(string? q, Guid? species, int page = 1)
+        public async Task<List<Animal>> get(string? q, Guid? species, int page = 1, Guid? id = null)
         {
+            if (id is not null)
+                return new() { await _context.Animals.FindAsync(id) };
             q = q?.ToLower();
             Taxon? rootTaxon = species is null ? null :
                 await _context.Taxons.FindAsync(species);
@@ -107,13 +115,19 @@ namespace ZooIS.Controllers
                 _context.Animals.Add(Animal);
             Animal.SpeciesGuid = new Guid(Form["Species"]);
             Animal.Name = Form["Name"];
-            Animal.Sex = new(Enum.Parse<Sex>(Form["Sex"]));
+            Animal.Sex = Enum.Parse<Sex>(Form["Sex"]);
             foreach (var ParentGuid in Form["Parents"].Select(id => new Guid(id)))
                 Animal.Parents.Add(await _context.Animals.FindAsync(ParentGuid));
             Animal.BirthDate = Form["BirthDate"] != "" ? DateTime.Parse(Form["BirthDate"]) : null;
+            foreach (IFormFile File in Form.Files) {
+                string PicturePath = $"/userfiles/{File.FileName}";
+                using (FileStream stream = new(PicturePath, FileMode.Create))
+                    await File.CopyToAsync(stream);
+                Animal.PicturePath = PicturePath;
+            }
             await _context.SaveChangesAsync();
             ViewBag.Sex = Enum.GetValues<Sex>().Select(E => E.GetRef()).ToList();
-			return RedirectToAction("Show", "Animals", Animal.Guid);
+			return RedirectToAction("Show", "Animals", new { id = Animal.Guid });
         }
 
         // GET: Animals/Edit/5

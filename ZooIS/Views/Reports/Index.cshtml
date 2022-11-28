@@ -4,4 +4,8 @@
 
 @using ZooIS.Components
 
-@await Component.InvokeAsync("HierarchyCombobox", ReportInput)
+<form method="GET" asp-action="Index">
+    <div class="col-6">
+        @await Component.InvokeAsync("HierarchyCombobox", ReportInput)
+    </div>
+</form>

@@ -6,18 +6,32 @@
 
 @using ZooIS.Components
 
-@await Component.InvokeAsync("HierarchyCombobox", ReportInput)
-
-<form method="POST">
-	<div class="form-group">
-		<label asp-for="Start"></label>
-		<input asp-for="Start" />
-	</div>
-	<div class="form-group">
-		<label asp-for="End"></label>
-		<input asp-for="End" />
-	</div>
-	<div class="form-group">
-		<button type="submit">Заказать</button>
+<form method="GET" asp-action="Index">
+	<div class="col-6">
+		@await Component.InvokeAsync("HierarchyCombobox", ReportInput)
 	</div>
 </form>
+
+<div class="col-6">
+	<form method="POST">
+		<div class="form-group">
+			<label class="required" asp-for="Start"></label>
+			<input asp-for="Start" />
+			<span asp-validation-for="Start" class="text-danger"></span>
+		</div>
+		<div class="form-group">
+			<label class="required" asp-for="End"></label>
+			<input asp-for="End" />
+			<span asp-validation-for="End" class="text-danger"></span>
+		</div>
+		<div class="form-group">
+			<button type="submit">Заказать</button>
+		</div>
+	</form>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

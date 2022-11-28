@@ -15,7 +15,6 @@ namespace ZooIS.Data
             : base(options)
         {
         }
-        public DbSet<Concept<Enum>> Concepts { get; set; }
         public DbSet<Taxon> Taxons { get; set; }
         public DbSet<Animal> Animals { get; set; }
         public DbSet<Food> Food { get; set; }
@@ -23,5 +22,5 @@ namespace ZooIS.Data
         public DbSet<Alert> Alerts { get; set; }
 
         public DbSet<Employee> Employees { get; set; }
-    }
+	}
 }

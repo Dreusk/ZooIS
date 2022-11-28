@@ -12,7 +12,8 @@
     
     function clear_fn() {
         input.value = null;
-        input.onchange();
+        let ev = new Event("change");
+        input.dispatchEvent(ev);
     }
     
     function component_did_mount() {
@@ -28,8 +29,8 @@
         }).call(this, root.querySelector(".search input"));
         
         (function(el) {
-            el.onclick = () => clear_fn;
-            el.onkeydown = (ev) => { if (ev.keyCode == 13) clear_fn };
+            el.onclick = () => clear_fn();
+            el.onkeydown = (ev) => { if (ev.keyCode == 13) clear_fn() };
         }).call(this, root.querySelector(".search .clear"));
         
         isActive.Subscribe(activate_fn);

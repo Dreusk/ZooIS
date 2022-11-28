@@ -25,7 +25,7 @@ namespace ZooIS.Components
                 public bool isInstant { get; set; } = false;
             }
             [Display(Name="Имя")]
-            public string Name { get; set; }
+            public string? Name { get; set; }
             [Display(Name = "Титул")]
             public string Title { get; set; } = "";
             [Display(Name = "Значения")]

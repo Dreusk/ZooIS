@@ -1,0 +1,12 @@
+﻿@model List<GeneologyResult>
+
+<table>
+    <tbody>
+        @foreach (var Item in Model)
+        {
+            <tr>
+                <td>@Item.Parent.Display -> @Item.Children.Display</td>
+            </tr>
+        }
+    </tbody>
+</table>

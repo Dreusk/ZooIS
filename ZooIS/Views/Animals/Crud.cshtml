@@ -63,7 +63,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Crud">
+        <form asp-action="Crud" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="Id" id="Id" value="@Model?.Guid" />
             <div class="form-group">
                 <label for="Photo">Фото</label>
@@ -100,6 +100,6 @@
     </div>
 </div>
 
-@*@section Scripts {
+@section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}*@
+}

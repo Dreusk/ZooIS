@@ -27,26 +27,24 @@ namespace ZooIS.Models
     public class Alert : Entity
     {
         [Required]
-        [Display(Name = "Сообщение")]
+        [Display(Name = "Краткое сообщение")]
         [MaxLength(255)]
         public string Message { get; set; }
-        
-        public object LevelId { get; set; }
+        [Display(Name = "Ссылка до отображениея")]
+        public string Url { get; set; }
         [Required]
         [Display(Name = "Уровень")]
-        public virtual Concept<AlertLevel> Level { get; set; }
-        
-        public object TypeId { get; set; }
+        public virtual AlertLevel Level { get; set; } = AlertLevel.Regular;
         [Required]
         [Display(Name = "Тип")]
-        public virtual Concept<AlertType> Type { get; set; }
+        public virtual AlertType Type { get; set; } = AlertType.Info;
         
         [Display(Name = "Прочитано?")]
         public bool isRead { get; set; } = false;
 
-        [Display(Name ="Временная метка")]
+        [Display(Name = "Временная метка")]
         [Required]
-        public DateTime ts { get; set; }
+        public DateTime ts { get; set; } = DateTime.Now;
 
         public string? UserId { get; set; }
         [ForeignKey("UserId")]

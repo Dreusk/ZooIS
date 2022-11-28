@@ -21,10 +21,8 @@ namespace ZooIS.Models
         [Display(Name = "Титул страницы")]
         [MaxLength(64)]
         public string PageTitle { get; set; }
-        
-        public object ActionId { get; set; }
         [Display(Name = "Действие")]
-        public virtual Concept<ActionType> Action { get; set; }
+        public ActionType Action { get; set; }
 
         public string UserId { get; set; }
         [ForeignKey("UserId")]

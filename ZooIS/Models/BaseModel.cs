@@ -74,18 +74,20 @@ namespace ZooIS.Models
         public abstract string Display { get; }
     }
 
-    [Display(Name ="Концепт")]
-    public class Concept<TEnum>: Ref<Concept<TEnum>.EEnum> where TEnum: Enum
+    [Display(Name = "Концепт")]
+    public class Concept<TEnum> : Ref<Concept<TEnum>.EEnum> where TEnum : Enum
     {
-        public Concept(TEnum Enum): base(new EEnum(Enum)) { }
+        public Concept() : base(new EEnum()) { }
+
+        public Concept(TEnum Enum) : base(new EEnum(Enum)) { }
 
         public static implicit operator Concept<TEnum>(TEnum Enum) => new(Enum);
         public static implicit operator TEnum(Concept<TEnum> Concept) => (TEnum)Concept.Id;
 
         /// <summary>
-        /// Boxer for the enums, realizing IEntity interface. Used only to create Ref on Enum.
+        /// Boxer for the enums, realizing IEntity interface. Used only to create Refs on Enums.
         /// </summary>
-        [Display(Name ="Сущность - перечисление")]
+        [Display(Name = "Сущность - перечисление")]
         public class EEnum : IEntity
         {
             private Enum _Value { get; set; } = null;
@@ -93,6 +95,8 @@ namespace ZooIS.Models
             public object Key { get => _Value; }
 
             public string Display { get => _Display; }
+
+            public EEnum() { }
 
             public EEnum(Enum Enum) => _Value = Enum;
         }

@@ -40,7 +40,7 @@ namespace ZooIS.Data
 			None
 		};
 
-		private static readonly Modules Initialization = Modules.Database;
+		private static readonly Modules Initialization = Modules.None;
 
 		public static async Task InitializeIdentity(IServiceProvider services)
 		{
@@ -127,8 +127,9 @@ namespace ZooIS.Data
 					await roleManager.AddClaimAsync(await roleManager.FindByNameAsync("Debug"), new("isDebug", "true")),
 
 					await roleManager.AddClaimAsync(await roleManager.FindByNameAsync("Admin"), new("AccessToRoles", "true")),
-					await roleManager.AddClaimAsync(await roleManager.FindByNameAsync("Admin"), new("AccessToUsers", "true"))
-			};
+					await roleManager.AddClaimAsync(await roleManager.FindByNameAsync("Admin"), new("AccessToUsers", "true")),
+					await roleManager.AddClaimAsync(await roleManager.FindByNameAsync("Admin"), new("AccessToBackend", "true"))
+            };
 			if (Results.Any(task => !task.Succeeded))
 			{
 				var E = new Exception("Something gone wrong");
@@ -196,7 +197,7 @@ namespace ZooIS.Data
 				new Taxon("Eykaryota")
 				{
 					Rank = TaxonRank.Domain,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Life).First(e => e.ScientificName == "Bios"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Life).First(e => e.ScientificName == "Bios"),
 					VernacularName = "Эвкариоты"
 				});
 			//Kingdoms
@@ -204,7 +205,7 @@ namespace ZooIS.Data
 				new Taxon("Animalia")
 				{
 					Rank = TaxonRank.Kingdom,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Domain).First(e => e.ScientificName == "Eykaryota"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Domain).First(e => e.ScientificName == "Eykaryota"),
 					VernacularName = "Животные"
 				});
 			//Phylums
@@ -212,7 +213,7 @@ namespace ZooIS.Data
 				new Taxon("Chordata")
 				{
 					Rank = TaxonRank.Phylum,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Kingdom).First(e => e.ScientificName == "Animalia"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Kingdom).First(e => e.ScientificName == "Animalia"),
 					VernacularName = "Хордовые"
 				});
 			//Classes
@@ -220,13 +221,13 @@ namespace ZooIS.Data
 				new Taxon("Mammalia")
 				{
 					Rank = TaxonRank.Class,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Phylum).First(e => e.ScientificName == "Chordata"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Phylum).First(e => e.ScientificName == "Chordata"),
 					VernacularName = "Млекопитающие"
 				},
 				new Taxon("Aves")
 				{
 					Rank = TaxonRank.Class,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Phylum).First(e => e.ScientificName == "Chordata"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Phylum).First(e => e.ScientificName == "Chordata"),
 					VernacularName = "Птицы"
 				});
 			//Order
@@ -234,19 +235,19 @@ namespace ZooIS.Data
 				new Taxon("Carnivora")
 				{
 					Rank = TaxonRank.Order,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Class).First(e => e.ScientificName == "Mammalia"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Class).First(e => e.ScientificName == "Mammalia"),
 					VernacularName = "Хищные"
 				},
 				new Taxon("Proboscidea")
 				{
 					Rank = TaxonRank.Order,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Class).First(e => e.ScientificName == "Mammalia"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Class).First(e => e.ScientificName == "Mammalia"),
 					VernacularName = "Хоботные"
 				},
 				new Taxon("Psittaciformes")
 				{
 					Rank = TaxonRank.Order,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Class).First(e => e.ScientificName == "Aves"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Class).First(e => e.ScientificName == "Aves"),
 					VernacularName = "Попугаеобразные"
 				});
 			//Families
@@ -254,19 +255,19 @@ namespace ZooIS.Data
 				new Taxon("Felidae")
 				{
 					Rank = TaxonRank.Family,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Order).First(e => e.ScientificName == "Carnivora"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Order).First(e => e.ScientificName == "Carnivora"),
 					VernacularName = "Кошачьи"
 				},
 				new Taxon("Elephantidae")
 				{
 					Rank = TaxonRank.Family,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Order).First(e => e.ScientificName == "Proboscidea"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Order).First(e => e.ScientificName == "Proboscidea"),
 					VernacularName = "Слоны"
 				},
 				new Taxon("Psittaculidae")
 				{
 					Rank = TaxonRank.Family,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Order).First(e => e.ScientificName == "Psittaciformes"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Order).First(e => e.ScientificName == "Psittaciformes"),
 					VernacularName = "Попугаи"
 				});
 			//Genus
@@ -274,19 +275,19 @@ namespace ZooIS.Data
 				new Taxon("Panthera")
 				{
 					Rank = TaxonRank.Genus,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Family).First(e => e.ScientificName == "Felidae"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Family).First(e => e.ScientificName == "Felidae"),
 					VernacularName = "Пантеры"
 				},
 				new Taxon("Loxodonta")
 				{
 					Rank = TaxonRank.Genus,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Family).First(e => e.ScientificName == "Elephantidae"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Family).First(e => e.ScientificName == "Elephantidae"),
 					VernacularName = "Африканские слоны"
 				},
 				new Taxon("Melopsittacus")
 				{
 					Rank = TaxonRank.Genus,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Family).First(e => e.ScientificName == "Psittaculidae"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Family).First(e => e.ScientificName == "Psittaculidae"),
 					VernacularName = "Певчие попугаи"
 				});
 			//Species
@@ -294,19 +295,19 @@ namespace ZooIS.Data
 				new Taxon("Panthera leo")
 				{
 					Rank = TaxonRank.Species,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Genus).First(e => e.ScientificName == "Panthera"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Genus).First(e => e.ScientificName == "Panthera"),
 					VernacularName = "Лев"
 				},
 				new Taxon("Loxodonta africana")
 				{
 					Rank = TaxonRank.Species,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Genus).First(e => e.ScientificName == "Loxodonta"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Genus).First(e => e.ScientificName == "Loxodonta"),
 					VernacularName = "Саванный слон"
 				},
 				new Taxon("Melopsittacus undulatus")
 				{
 					Rank = TaxonRank.Species,
-					Parent = context.Taxons.Local.Where(e => (TaxonRank)e.RankId == TaxonRank.Genus).First(e => e.ScientificName == "Melopsittacus"),
+					Parent = context.Taxons.Local.Where(e => e.Rank == TaxonRank.Genus).First(e => e.ScientificName == "Melopsittacus"),
 					VernacularName = "Волнистый попугай"
 				});
 			await context.SaveChangesAsync();

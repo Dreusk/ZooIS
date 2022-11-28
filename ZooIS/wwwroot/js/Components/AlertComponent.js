@@ -91,8 +91,8 @@
         li.onclick = function() {item_onclick(item)};
         li.onkeydown = function(ev) {item_onkeydown(ev, item)};
         li.innerHTML = `
-        <div class=${item["level"]["value"].toLowerCase()}>
-            <div class=${item["type"]["value"].toLowerCase()}>[${item["type"]["display"]}]</div>
+        <div data-level=${item["level"]["id"]}>
+            <div data-type=${item["type"]["id"]}>[${item["type"]["display"]}]</div>
             <div>${item["display"]}</div>
         </div>`;
         return li;

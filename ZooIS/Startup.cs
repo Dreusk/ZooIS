@@ -44,6 +44,10 @@ namespace ZooIS
                 .AddEntityFrameworkStores<ZooISContext>();
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("AccessToBackend", policy =>
+                {
+                    policy.RequireClaim("AccessToBackend", "true");
+                });
                 options.AddPolicy("AccessToRoles", policy =>
                 {
                     policy.RequireClaim("AccessToRoles", "true");

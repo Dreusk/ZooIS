@@ -46,9 +46,8 @@ namespace ZooIS.Models
         [Display(Name = "Народное название")]
         public string? VernacularName { get; set; }
         
-        public object RankId { get; set; }
         [Display(Name = "Ранг")]
-        public virtual Concept<TaxonRank> Rank { get; set; } = new(TaxonRank.Species);
+        public TaxonRank Rank { get; set; } = TaxonRank.Species;
 
         public Guid? ParentGuid { get; set; }
 
@@ -118,10 +117,8 @@ namespace ZooIS.Models
         [Display(Name = "Вид")]
         public virtual Taxon Species { get; set; }
         [Required(ErrorMessage = "Обязательное поле.")]
-
-        public object SexId { get; set; }
         [Display(Name = "Пол")]
-        public virtual Concept<Sex> Sex { get; set; }
+        public Sex Sex { get; set; }
         [Display(Name = "Состояние")]
         public Status Status { get; set; } = new();
         [Display(Name ="Родители")]
@@ -151,9 +148,8 @@ namespace ZooIS.Models
 	[Owned]
     [Display(Name = "Состояние")]
     public class Status {
-        public object HealthId { get; set; }
         [Display(Name = "Здоровье")]
-        public virtual Concept<Health> Health { get; set; }
+        public Health Health { get; set; }
 	}
 
     [Display(Name = "Характеризация")]

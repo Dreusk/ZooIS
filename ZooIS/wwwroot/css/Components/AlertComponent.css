@@ -82,26 +82,26 @@
     box-shadow: none;
 }
 
-.alert-wrap li:has(div.regular) {
+.alert-wrap li:has(div[data-level="0"]) {
     border-left-color: azure;
 }
 
-.alert-wrap li:has(div.warning) {
+.alert-wrap li:has(div[data-level="1"]) {
     border-left-color: yellow;
 }
 
-.alert-wrap li:has(div.alert) {
+.alert-wrap li:has(div[data-level="2"]) {
     border-left-color: orangered;
 }
 
-.alert-wrap li div.info {
+.alert-wrap li div[data-type="0"] {
     color: grey
 }
 
-.alert-wrap li div.success {
+.alert-wrap li div[data-type="1"] {
     color: greenyellow;
 }
 
-.alert-wrap li div.fail {
+.alert-wrap li div[data-type="2"] {
     color: crimson;
 }

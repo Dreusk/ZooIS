@@ -8,7 +8,10 @@
 </script>
 
 <div class="combobox-wrap">
-	<label for="@Model.Name" class="@(Model.Flags.isRequired ? "required" : "")">@Model.Title</label>
+	@if (Model.Title is not null)
+	{
+		<label for="@Model.Name" class="@(Model.Flags.isRequired ? "required" : "")">@Model.Title</label>
+	}
 	@if (Model.Flags.isMultiselectable)
 	{
 		<ul>

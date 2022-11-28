@@ -18,7 +18,7 @@ namespace ZooIS.Models
         /// A list of roles that can see this page in layout.
         /// </summary>
         [Display(Name = "Видимость")]
-        public List<string> VisibleFor { get; set; } = new();
+        public HashSet<string> VisibleFor { get; set; } = new();
 
         public object Key { get => Controller; }
 
@@ -29,7 +29,12 @@ namespace ZooIS.Models
         new(){
             Controller = "Animals",
             Display = "Животные",
-            VisibleFor = new List<string>{"Caretaker"}
+            VisibleFor = new HashSet<string>{"Caretaker"}
+        },
+        new(){
+            Controller = "Reports",
+            Display = "Отчеты",
+            VisibleFor = new HashSet<string>{"Caretaker"}
         }};
     }
 }

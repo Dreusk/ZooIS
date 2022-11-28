@@ -108,6 +108,14 @@
 	
 	function clear_fn() {
 		Value.Set([]);
+		if (isInstant) {
+			let tmp = root;
+			while (tmp != null && tmp.tagName != "FORM")
+				tmp = tmp.parentElement;
+			if (tmp == null)
+				return;
+			tmp.submit();
+		}
 	}
 
 	function isChildSelected(item) {
@@ -143,16 +151,18 @@
 	function SetValue(item) {
 		let value = {value:   item["id"] ?? item["value"],
 			 		 display: item["display"]};
-		if (isInstant) {
-			let SearchParams = new URLSearchParams(window.location.search);
-			SearchParams.set("report", value["value"]);
-			window.location.search = SearchParams.toString();
-			return;
-		}
 		if (!Value.Get().map((item) => item["value"]).includes(value["value"]))
 			Value.Swap((Value) => push_value(Value, value));
 		else
 			Value.Swap((Value) => remove_value(Value, value));
+		if (isInstant) {
+				let tmp = root;
+				while (tmp != null && tmp.tagName != "FORM")
+					tmp = tmp.parentElement;
+				if (tmp == null)
+					return;
+				tmp.submit();
+			}
 		if (!isMultiselect)
 			setTimeout(() => isExpanded.Set(false), 10);
 	}
