@@ -146,6 +146,24 @@ class Modal {
     }
 }
 
+class Flash {
+    #msg = "";
+
+    constructor(msg) {
+        this.#msg = msg;
+
+        let flash = document.createElement("div");
+        flash.classList.add("flash");
+        flash.textContent = msg;
+        let timer = setTimeout(() => flash.remove(), 4000);
+        flash.onclick = () => {
+            flash.remove();
+            clearTimeout(timer); }
+        document.body.appendChild(flash);
+        return flash;
+    }
+}
+
 ///Xhr utils
 function xhr_load(ev, success_fn) {
     if (ev.target.status != 200 ||
@@ -155,21 +173,12 @@ function xhr_load(ev, success_fn) {
         success_fn(ev.target.response, ev.target);
 }
 
-function xhr_error(ev) {
-    let error = document.createElement("div");
-    let msg = "Проблема сети";
-    error.classList.add("flash");
+function xhr_error() {
+    let error = new Flash("Проблема сети")
     error.classList.add("error");
-    error.textContent = msg;
-    let timer = setTimeout(() => error.remove(), 4000);
-    error.onclick = () => {
-        error.remove();
-        clearTimeout(timer); }
-    document.body.appendChild(error);
 }
 
 function xhr_fail(xhr) {
-    let error = document.createElement("div");
     let msg = "";
     switch (xhr.status) {
         case 404:
@@ -184,14 +193,8 @@ function xhr_fail(xhr) {
         default:
             msg = "Неизвестная ошибка";
     }
-    error.classList.add("flash");
+    let error = new Flash(msg);
     error.classList.add("error");
-    error.textContent = msg;
-    let timer = setTimeout(() => error.remove(), 4000);
-    error.onclick = () => {
-        error.remove();
-        clearTimeout(timer); }
-    document.body.appendChild(error);
 }
 
 (function() {

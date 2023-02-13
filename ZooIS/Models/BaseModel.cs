@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZooIS.Data;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace ZooIS.Models
 {
@@ -42,7 +43,9 @@ namespace ZooIS.Models
         [Display(Name = "Тип")]
         [Key]
         [Column(Order =1)]
-        public string Type { get => Id.GetType().Name; }
+        public string Type { get => typeof(T).Name; }
+
+        public Ref() { }
 
         public Ref(T Entity)
         {
@@ -99,6 +102,34 @@ namespace ZooIS.Models
             public EEnum() { }
 
             public EEnum(Enum Enum) => _Value = Enum;
+        }
+    }
+
+    /// <summary>
+    /// Specifies that this DateTime property value cannot exceed current timestamp.
+    /// </summary>
+    public class NotFutureAttribute: ValidationAttribute
+    {
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            if (value is not null && (DateTime)value > DateTime.Now)
+                return new ValidationResult(ErrorMessage);
+            return ValidationResult.Success;
+        }
+    }
+
+    /// <summary>
+    /// Specifies that this DateTime property value cannot lag behind current timestamp.
+    /// </summary>
+    public class NotPastAttribute : ValidationAttribute
+    {
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            if (value is not null &&  (DateTime)value < DateTime.Now)
+                return new ValidationResult(ErrorMessage);
+            return ValidationResult.Success;
         }
     }
 }

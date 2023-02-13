@@ -1,11 +1,17 @@
+@model List<Report>
+
+@using ZooIS.Components
+
 @{
     var ReportInput = (HierarchyCombobox.Params)ViewBag.ReportInput;
 }
 
-@using ZooIS.Components
+<script defer src="~/js/Reports/Index.js"></script>
 
 <form method="GET" asp-action="Index">
     <div class="col-6">
         @await Component.InvokeAsync("HierarchyCombobox", ReportInput)
     </div>
 </form>
+
+@await Component.InvokeAsync("Infinite", new Infinite.Params {Url = "/Reports/get"})

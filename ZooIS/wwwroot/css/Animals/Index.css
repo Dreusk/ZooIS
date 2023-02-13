@@ -1,8 +1,5 @@
 ﻿.paging {
     width: fit-content;
-    border: 0px solid grey;
-    border-top-width: 1px;
-    border-bottom-width: 1px;
     border-radius: 9px;
     margin-bottom: 0.5rem;
 }
@@ -24,7 +21,7 @@
     box-shadow: none;
 }
 
-.card.animal:hover {
+a:hover .card.animal, a:focus-visible .card.animal {
     top: -2rem;
     box-shadow: 0px 2rem 1rem grey;
     z-index: 2;

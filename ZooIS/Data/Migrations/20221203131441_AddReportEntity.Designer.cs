@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZooIS.Data;
 
 namespace ZooIS.Data.Migrations
 {
     [DbContext(typeof(ZooISContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221203131441_AddReportEntity")]
+    partial class AddReportEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,8 +255,6 @@ namespace ZooIS.Data.Migrations
                     b.HasIndex("SpeciesGuid");
 
                     b.ToTable("Animals");
-
-                    b.HasCheckConstraint("BirthDate_NoFuture", "BirthDate <= CURRENT_TIMESTAMP");
                 });
 
             modelBuilder.Entity("ZooIS.Models.CharacterTag", b =>
@@ -391,10 +391,6 @@ namespace ZooIS.Data.Migrations
                         .IsRequired()
                         .HasColumnType("xml");
 
-                    b.Property<string>("RequesterId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Result")
                         .IsRequired()
                         .HasColumnType("xml");
@@ -406,8 +402,6 @@ namespace ZooIS.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Guid");
-
-                    b.HasIndex("RequesterId");
 
                     b.ToTable("Reports");
                 });
@@ -653,7 +647,7 @@ namespace ZooIS.Data.Migrations
             modelBuilder.Entity("ZooIS.Models.Alert", b =>
                 {
                     b.HasOne("ZooIS.Models.User", "User")
-                        .WithMany("Alerts")
+                        .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
@@ -758,17 +752,6 @@ namespace ZooIS.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ZooIS.Models.Report", b =>
-                {
-                    b.HasOne("ZooIS.Models.User", "Requester")
-                        .WithMany("Reports")
-                        .HasForeignKey("RequesterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Requester");
-                });
-
             modelBuilder.Entity("ZooIS.Models.Taxon", b =>
                 {
                     b.HasOne("ZooIS.Models.Taxon", "Parent")
@@ -792,11 +775,7 @@ namespace ZooIS.Data.Migrations
 
             modelBuilder.Entity("ZooIS.Models.User", b =>
                 {
-                    b.Navigation("Alerts");
-
                     b.Navigation("Employee");
-
-                    b.Navigation("Reports");
                 });
 #pragma warning restore 612, 618
         }

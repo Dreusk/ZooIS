@@ -4,7 +4,8 @@
 @using ZooIS.Components
 
 @{
-    Ref<IEntity>? SpeciesRef = null;
+    string NoPicturePath = "/static/NoPhoto.png";
+    Ref<IEntity>? SpeciesRef = ViewBag.SpeciesRef;
     HierarchyCombobox.Params SpeciesInput = new()
     {
         Flags = new()
@@ -15,7 +16,7 @@
         },
         Title = "Вид",
         Name = "Species",
-        Placeholder = "Выберите вид...",
+        Placeholder = "Выберите вид …",
         Value = SpeciesRef is not null ? new() { SpeciesRef } : new(),
         Url = "/Taxons/get_hierarchy",
         SearchParams = new()
@@ -24,6 +25,7 @@
         }
     };
 
+    Ref<IEntity>? SexRef = ViewBag.SexRef;
     HierarchyCombobox.Params SexInput = new()
     {
         Flags = new()
@@ -32,10 +34,12 @@
         },
         Title = "Пол",
         Name = "Sex",
+        Value = SexRef is not null ? new() { SexRef } : new(),
         Items = ViewBag.Sex,
-        Placeholder = "",
+                Placeholder = "Выберите пол …",
     };
 
+    List<Ref<IEntity>>? Parents = ViewBag.Parents;
     HierarchyCombobox.Params ParentsInput = new()
     {
         Flags = new()
@@ -48,6 +52,7 @@
         DisabledPlaceholder = "Выберите вид",
         MaxCount = 2,
         Url = "/Animals/getRefs",
+        Value = Parents ?? new(),
         SearchParams = new() { },
         Dependencies = new() { "Species" }
 
@@ -67,6 +72,10 @@
             <input type="hidden" name="Id" id="Id" value="@Model?.Guid" />
             <div class="form-group">
                 <label for="Photo">Фото</label>
+                @if (Model is not null)
+                {
+                    <img class="d-block mb-2" src="@(Model.PicturePath ?? NoPicturePath)" title="@Model.Name" />
+                }
                 <input type="file" accept="image/*" name="Photo" id="Photo" />
             </div>
             <div class="form-group">

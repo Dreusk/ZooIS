@@ -61,6 +61,8 @@ namespace ZooIS.Models
 
         public override string Display { get => VernacularName ?? ScientificName; }
 
+        public Taxon(): base() { }
+
         public Taxon(string ScientificName): base() => this.ScientificName = ScientificName;
 
         public async Task<IEnumerable<Taxon>> GetSpecies(ZooISContext context)
@@ -109,8 +111,9 @@ namespace ZooIS.Models
         [Required(ErrorMessage = "Обязательное поле.")]
         public string Name { get; set; }
         [Display(Name = "Возраст")]
-        public DateTime? Age { get => BirthDate is not null ? new DateTime((DateTime.Now.AddYears(-1) - BirthDate)?.Ticks ?? default(long)) : null; }
+        public int? Age { get => BirthDate is not null ? ((DateTime.Now.AddYears(-1) - BirthDate)?.Days / 365) : null; }
         [Display(Name = "Дата рождения")]
+        [NotFuture(ErrorMessage ="Дата рождения не может быть в будущем")]
         public DateTime? BirthDate { get; set; }
         public Guid SpeciesGuid { get; set; }
         [Required(ErrorMessage ="Обязательное поле.")]

@@ -21,6 +21,14 @@ namespace ZooIS.Data
         public DbSet<Log> Logs { get; set; }
         public DbSet<Alert> Alerts { get; set; }
 
+        public DbSet<Report> Reports { get; set; }
+
         public DbSet<Employee> Employees { get; set; }
-	}
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<Animal>().HasCheckConstraint("BirthDate_NoFuture", "BirthDate <= CURRENT_TIMESTAMP");
+        }
+    }
 }

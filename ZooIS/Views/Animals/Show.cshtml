@@ -17,6 +17,7 @@
                 return "";
         }
     };
+    string NoPicturePath = "/static/NoPhoto.png";
 }
 
 <link rel="stylesheet" href="~/css/Animals/Show.css" />
@@ -26,7 +27,7 @@
 <div>
     <hr />
     <h4>@Model.Name</h4>
-    <img src="@Model.PicturePath" title="@Model.Display" />
+    <img src="@(Model.PicturePath ?? NoPicturePath)" title="@Model.Display" />
     <dl>
         <dt>Общие данные</dt>
         <dd>
@@ -44,7 +45,7 @@
                                 @Model.Species.Display
                             </a>
                         </td>
-                        <td>@(Model.Age?.Year.ToString() ?? "Неизвестен")</td>
+                        <td>@(Model.Age?.ToString() ?? "Неизвестен")</td>
                     </tr>
                 </tbody>
             </table>
@@ -86,4 +87,9 @@
             </ul>
         </dd>
     </dl>
+    <div class="mt-2">
+        <a class="btn" asp-action="Crud" asp-route-id="@Model.Key">
+            Изменить
+        </a>
+    </div>
 </div>

@@ -32,6 +32,16 @@ namespace ZooIS.Models
             VisibleFor = new HashSet<string>{"Caretaker"}
         },
         new(){
+            Controller = "Taxons",
+            Display = "Виды",
+            VisibleFor = new HashSet<string>{"Caretaker"}
+        },
+        new(){
+            Controller = "Users",
+            Display = "Пользователи",
+            VisibleFor = new HashSet<string>{"Admin"}
+        },
+        new(){
             Controller = "Reports",
             Display = "Отчеты",
             VisibleFor = new HashSet<string>{"Caretaker"}

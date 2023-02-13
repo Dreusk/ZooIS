@@ -1,0 +1,28 @@
+﻿@{
+    Dictionary<string, IEntity> Params = (Dictionary<string, IEntity>)ViewData["Params"];
+    Role? Role = (Role)Params["Роль"];
+    Ref<IEntity>? RoleRef = Role is not null ? new(Role) : null;
+    HierarchyCombobox.Params SpeciesInput = new()
+            {
+                Flags = new()
+                {
+                    isSearchable = true,
+                    isMultiselectable = false,
+                },
+                Title = "Роль",
+                Name = "Role",
+                Placeholder = "Выберите роль...",
+                Value = RoleRef is not null ? new() { RoleRef } : new(),
+                Url = "/Roles/get",
+                SearchParams = new() {}
+            };
+}
+
+@using ZooIS.Data
+@using ZooIS.Components
+
+<div class="row">
+	<div class="col-6">
+		@await Component.InvokeAsync("HierarchyCombobox", SpeciesInput)
+	</div>
+</div>

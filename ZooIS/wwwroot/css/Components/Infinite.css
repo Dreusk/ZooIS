@@ -1,0 +1,77 @@
+.infinite {
+    margin-top: 0.75em;
+}
+
+.infinite ul {
+    width: 100%;
+    padding: 0;
+    position: relative;
+}
+
+.infinite li {
+    width: 100%;
+    user-select: none;
+    background-color: white;
+    border-radius: 9px;
+    box-shadow: 0px 0px 3px white, 0px 0.15em 3px grey;
+    padding: 0.5rem 0.35rem;
+    margin-bottom: 0.25em;
+    list-style-type: none;
+
+    transition: margin-top 0.2s, margin-bottom 0.2s, box-shadow 0.4s;
+}
+
+.infinite li:hover, .infinite li:focus-visible {
+    margin-top: -0.10em;
+    margin-bottom: 0.35em;
+    border-color: gold;
+    box-shadow: 0 0 3px 3px gold, 0px 0.35em 3px grey;
+    outline: 1px solid gold;
+}
+
+.msg {
+    position: absolute;
+    left: 45%;
+    color: grey;
+}
+
+img.loading {
+    width: 2em;
+    height: 2em;
+    filter: invert(65%) sepia(0%) saturate(3256%) hue-rotate(87deg) brightness(75%) contrast(91%);
+
+    animation: revolve 1.5s linear 0s infinite;
+}
+
+@keyframes revolve {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+div.loading {
+    margin-left: -25%;
+}
+
+div.loading::after {
+    content: "";
+    animation: dot-dot-dot 1s linear 0s infinite;
+}
+
+@keyframes dot-dot-dot {
+    0% {
+        content: ".";
+    }
+
+    33% {
+        content: "..";
+    }
+
+    50% {
+        content: "...";
+    }
+}

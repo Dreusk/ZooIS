@@ -1,0 +1,14 @@
+﻿@model Infinite.Params
+
+@using ZooIS.Components
+
+@{
+    string q = Context.Request.Query["q"].ToString();
+}
+
+<link rel="stylesheet" href="~/css/Components/Infinite.css" />
+<script defer src="~/js/Components/Infinite.js">
+    @Json.Serialize(Model)
+</script>
+
+<div class="infinite"> </div>

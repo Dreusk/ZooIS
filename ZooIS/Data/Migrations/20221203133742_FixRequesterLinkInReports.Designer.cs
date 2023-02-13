@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZooIS.Data;
 
 namespace ZooIS.Data.Migrations
 {
     [DbContext(typeof(ZooISContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221203133742_FixRequesterLinkInReports")]
+    partial class FixRequesterLinkInReports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,8 +255,6 @@ namespace ZooIS.Data.Migrations
                     b.HasIndex("SpeciesGuid");
 
                     b.ToTable("Animals");
-
-                    b.HasCheckConstraint("BirthDate_NoFuture", "BirthDate <= CURRENT_TIMESTAMP");
                 });
 
             modelBuilder.Entity("ZooIS.Models.CharacterTag", b =>

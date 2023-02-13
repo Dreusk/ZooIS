@@ -16,6 +16,7 @@ using ZooIS.Data.Migrations;
 using ZooIS.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.CodeAnalysis;
 
 namespace ZooIS.Controllers
 {
@@ -34,6 +35,7 @@ namespace ZooIS.Controllers
         [HttpGet]
         public async Task<List<Animal>> get(string? q, Guid? species, int page = 1, Guid? id = null)
         {
+            const int count = 9;
             if (id is not null)
                 return new() { await _context.Animals.FindAsync(id) };
             q = q?.ToLower();
@@ -46,8 +48,8 @@ namespace ZooIS.Controllers
                           .Include(e => e.Species)
                           .Where(e => species == null || Taxons.Select(e => e.Guid).Contains(e.SpeciesGuid))
                           .OrderBy(e => e.Name)
-                          .Skip((page - 1) * 18)
-                          .Take(18)
+                          .Skip((page - 1) * count)
+                          .Take(count)
                           .ToListAsync();
         }
 
@@ -61,17 +63,15 @@ namespace ZooIS.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? q, Guid? species, int page = 1)
+        public async Task<IActionResult> Index(string? q, Guid? species)
         {
-            List<Animal> Animals = await get(q, species, page);
             Taxon? rootTaxon = species is null ? null :
                 await _context.Taxons.FindAsync(species);
-            ViewData["Page"] = page;
             ViewData["Params"] = new Dictionary<string, IEntity>
             {
                 { "Вид", rootTaxon }
             };
-            return View(Animals);
+            return View();
         }
 
         [HttpGet]
@@ -98,7 +98,14 @@ namespace ZooIS.Controllers
         [HttpGet]
         public async Task<IActionResult> Crud(Guid? id)
         {
-            Animal? Animal = id != null ? await _context.Animals.FindAsync(id) : null;
+            Animal? Animal = id != null ? await _context.Animals
+                .Include(e => e.Species)
+                .Include(e => e.Parents)
+                .FirstAsync(e => e.Guid == id)
+                : null;
+            ViewBag.SpeciesRef = Animal is not null ? new Ref<IEntity>(Animal?.Species) : null;
+            ViewBag.Parents = Animal is not null ? Animal.Parents.Select(e => new Ref<IEntity>(e)).ToList() : null;
+            ViewBag.SexRef = Animal is not null ? Animal?.Sex.GetRef() : null;
             ViewBag.Sex = Enum.GetValues<Sex>().Select(E => E.GetRef()).ToList();
             return View(Animal);
         }
@@ -114,6 +121,7 @@ namespace ZooIS.Controllers
             else
                 _context.Animals.Add(Animal);
             Animal.SpeciesGuid = new Guid(Form["Species"]);
+            Animal.Species = await _context.Taxons.FindAsync(Animal.SpeciesGuid);
             Animal.Name = Form["Name"];
             Animal.Sex = Enum.Parse<Sex>(Form["Sex"]);
             foreach (var ParentGuid in Form["Parents"].Select(id => new Guid(id)))
@@ -125,9 +133,15 @@ namespace ZooIS.Controllers
                     await File.CopyToAsync(stream);
                 Animal.PicturePath = PicturePath;
             }
+            TryValidateModel(Animal);
+            if (!ModelState.IsValid) {
+                ViewBag.SpeciesRef = new Ref<IEntity>(Animal.Species);
+                ViewBag.SexRef = Animal.Sex.GetRef();
+                ViewBag.Sex = Enum.GetValues<Sex>().Select(E => E.GetRef()).ToList();
+                return View(Animal);
+            }
             await _context.SaveChangesAsync();
-            ViewBag.Sex = Enum.GetValues<Sex>().Select(E => E.GetRef()).ToList();
-			return RedirectToAction("Show", "Animals", new { id = Animal.Guid });
+            return RedirectToAction("Show", "Animals", new { id = Animal.Guid });
         }
 
         // GET: Animals/Edit/5

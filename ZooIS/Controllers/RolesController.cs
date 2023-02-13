@@ -34,6 +34,17 @@ namespace ZooIS.Controllers
                 .OrderBy(e => e.Display)
                 .Select(e => new Ref<Role>(e))
                 .ToListAsync();
-        }      
+        }
+
+        [HttpGet]
+        [Ignore]
+        public async Task<List<Role>> get(string? q)
+        {
+            q = q?.ToLower();
+            return await _context.Roles.AsQueryable()
+                .Where(e => q == null || e.Name.ToLower().Contains(q))
+                .OrderBy(e => e.Name)
+                .ToListAsync();
+        }
     }
 }

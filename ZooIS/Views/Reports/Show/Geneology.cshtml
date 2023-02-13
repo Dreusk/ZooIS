@@ -1,12 +1,48 @@
-﻿@model List<GeneologyResult>
+﻿@model Report
+
+@using ZooIS.Components
+
+@{
+    GeneologyParams Params = Model.XmlParams.Deparse<GeneologyParams>();
+    List<GeneologyResult> Result = Model.XmlResult.Deparse<List<GeneologyResult>>();
+
+    ExportButton.Params ExportButton = new()
+    {
+        Url = $"/Reports/{Model.Guid}/Export"
+    };
+}
+
+<h1 class="mb-2">Просмотр отчета</h1>
+<h2 class="mb-2">Генеалогическое дерево</h2>
+
+<div>
+    <h4>Параметры</h4>
+    <ul>
+        <li>
+            @Html.DisplayNameFor(model => Params.Animal):
+            @Params.Animal.Display
+        </li>
+    </ul>
+</div>
 
 <table>
+    <thead>
+        <tr>
+            <th>Родитель</th>
+            <th>Ребенок</th>
+        </tr>
+    </thead>
     <tbody>
-        @foreach (var Item in Model)
+        @foreach(var item in Result)
         {
             <tr>
-                <td>@Item.Parent.Display -> @Item.Children.Display</td>
+                <td>@item.Parent.Display</td>
+                <td>@item.Children.Display</td>
             </tr>
         }
     </tbody>
 </table>
+
+<div class="mt-2">
+    @await Component.InvokeAsync("ExportButton", ExportButton)
+</div>

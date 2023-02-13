@@ -1,0 +1,10 @@
+﻿@model ExportButton.Params
+
+@using ZooIS.Components
+
+<div>
+    <script defer src="~/js/Components/ExportButton.js">
+        @Json.Serialize(Model)
+    </script>
+    <button type="button">Экспорт (.xlsx)</button>
+</div>

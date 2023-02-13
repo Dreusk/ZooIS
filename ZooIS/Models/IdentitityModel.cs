@@ -17,6 +17,11 @@ namespace ZooIS.Models
         [Display(Name = "Роли")]
         public virtual HashSet<Role> Roles { get; set; } = new();
 
+        [Display(Name ="Оповещения")]
+        public HashSet<Alert> Alerts { get; set; } = new();
+        [Display(Name = "Отчеты")]
+        public HashSet<Report> Reports { get; set; } = new();
+
         public Employee AsEmployee() => Employee;
 
         public string Display { get => Employee?.Display ?? UserName; }

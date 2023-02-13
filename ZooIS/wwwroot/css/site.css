@@ -187,7 +187,7 @@ input[type="file"]:focus {
   background: none;
 }
 
-[disabled="true"] {
+[disabled="true"], button:disabled {
   background-color: lightblue !important;
   border-color: grey !important;
   cursor: default !important;
@@ -197,7 +197,7 @@ input[type="file"]:focus {
   cursor: default !important;
 }
 
-[disabled="true"] *:hover, [disabled="true"] *:focus {
+[disabled="true"] *:hover, [disabled="true"] *:focus, button:disabled:hover, button:disabled:focus {
   outline: none !important;
   border-color: initial !important;
 }
@@ -216,6 +216,10 @@ input[type="file"]:focus {
 input, select, button {
     border-radius: 9px;
     border: 1px solid black;
+}
+
+button:active {
+  background-color: lightgrey;
 }
 
 input:focus, input:hover, select:focus, select:hover, button:focus, button:hover, button:focus-visible {
@@ -374,4 +378,9 @@ label.required::after {
 .flash.error {
   background-color: pink;
   color: gray;
+}
+
+a:has(div):focus {
+  outline: none;
+  border: none;
 }

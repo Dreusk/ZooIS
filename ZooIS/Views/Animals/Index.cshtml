@@ -1,9 +1,4 @@
-﻿@model IEnumerable<ZooIS.Models.Animal>
-
-@{
-    string NoPicturePath = "/static/NoPhoto.png";
-    int Page = (int)ViewData["Page"];
-}
+﻿@using ZooIS.Components;
 
 <link rel="stylesheet" href="~/css/Animals/Index.css" />
 <script defer src="~/js/Animal/Index.js"></script>
@@ -11,32 +6,14 @@
 <div class="flex-row">
     <h1>
         @ViewData["Title"].ToString()
-        <a asp-action="Crud" class="ml-2" title="Зарегистрировать новое">+</a>
+        <a asp-action="Crud" class="ml-2" title="Зарегистрировать">+</a>
     </h1>
 </div>
 
 @await Component.InvokeAsync("IndexSearch", "Partial/_SearchForm")
 
-<div class="paging">
-    <button type="button"> << </button>
-    <button type="button"> < </button>
-    <input type="number" form="search" id="page" name="page" value="@Page" />
-    <button type="button"> > </button>
+<div class="collection">
+
 </div>
 
-<div class="collection">
-    @foreach (var Animal in Model)
-    {
-        <a class="text-inherit" asp-action="Show" asp-route-id="@Animal.Guid">
-            <div class="card animal animated text-center">
-                <img class="photo" src="@(Animal.PicturePath ?? NoPicturePath)" title="@Animal.Display" />
-                <div class="font-weight-bold">@Animal.Name</div>
-                <div class="text-muted">@Animal.Species.Display, @Animal.Age?.Year лет</div>
-            </div>
-        </a>
-    }
-    @if (Model.Count() == 0)
-    {
-        <div class="message text-muted">Животные отсутствуют</div>
-    }
-</div>
+@await Component.InvokeAsync("Infinite", new Infinite.Params { Url = "/Animals/get" })
