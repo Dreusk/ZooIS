@@ -18,10 +18,16 @@ namespace ZooIS.Data
     {
         public static Ref<IEntity> GetRef<TEnum> (this TEnum Enum) where TEnum: Enum => new Ref<IEntity>(new Concept<TEnum>.EEnum(Enum));
 
-        public static string GetDisplay<T> (this T Enum) where T: Enum
+        public static object GetValue<T>(this T E) where T : Enum
         {
-            return Enum.GetType()
-                    .GetMember(Enum.ToString())
+            Type underlyingType = Enum.GetUnderlyingType(E.GetType());
+            return Convert.ChangeType(E, underlyingType);
+        }
+
+        public static string GetDisplay<T> (this T E) where T: Enum
+        {
+            return E.GetType()
+                    .GetMember(E.ToString())
                     .First()
                     .GetCustomAttribute<DisplayAttribute>()
                     .GetName();

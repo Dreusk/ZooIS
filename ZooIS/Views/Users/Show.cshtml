@@ -1,1 +1,34 @@
 ﻿@model User
+
+<link rel="stylesheet" href="~/css/Show.css" />
+
+<h1>@ViewData["Title"].ToString().Split(" - ").First()</h1>
+<h4>Пользователя</h4>
+<hr />
+
+<dl>
+    <dt>@Html.DisplayNameFor(model => model.UserName)</dt>
+    <dd>@Model.UserName</dd>
+
+    <dt>@Html.DisplayNameFor(model => model.Employee.Name)</dt>
+    <dd>@(Model.Employee?.Name.Display ?? "Отсутствует")</dd>
+
+    <dt>@Html.DisplayNameFor(model => model.Roles)</dt>
+    <dd>
+        <ul>
+            @foreach(Role role in Model.Roles)
+            {
+                <li>
+                    <a asp-controller="Roles" asp-action="Show" asp-route-id="@role.Id">
+                        <span>@role.Display</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </dd>
+</dl>
+<div class="mt-2">
+    <a class="btn" asp-action="Crud" asp-route-id="@Model.Key">
+        Изменить
+    </a>
+</div>

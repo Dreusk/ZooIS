@@ -1,40 +1,72 @@
-﻿@model ZooIS.Models.Taxon
+﻿@model Taxon?
+
+@using ZooIS.Components;
 
 @{
-    ViewData["Title"] = "Create";
+    Ref<IEntity>? RankRef = ViewBag.RankRef;
+    HierarchyCombobox.Params RankInput = new()
+            {
+                Flags = new()
+                {
+                    isRequired = true
+                },
+                Title = "Ранг",
+                Name = "Rank",
+                Placeholder = "Выберите ранг …",
+                Value = RankRef is not null ? new() { RankRef } : new(),
+                Items = ViewBag.Ranks
+            };
+
+    Ref<IEntity> ParentRef = ViewBag.ParentRef;
+    HierarchyCombobox.Params ParentInput = new()
+    {
+        Flags = new()
+        {
+            isSearchable = true
+        },
+        Title = "Родительский таксон",
+        Name = "Parent",
+        Placeholder = "Выберите таксон …",
+        Value = ParentRef is not null ? new() {ParentRef} : new(),
+        Url = "/Taxons/get_offByOne",
+        Dependencies = new() { "Rank" }
+    };
 }
 
-<h1>Create</h1>
-
-<h4>Taxon</h4>
+<h1>Регистрация</h1>
+<h4>Вида</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form method="post">
+            <input type="hidden" name="Id" id="Id" value="@Model?.Guid" />
             <div class="form-group">
-                <label asp-for="ScientificName" class="control-label"></label>
-                <input asp-for="ScientificName" class="form-control" />
+                <label asp-for="ScientificName" class="required"></label>
+                <input asp-for="ScientificName" />
                 <span asp-validation-for="ScientificName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="VernacularName" class="control-label"></label>
-                <input asp-for="VernacularName" class="form-control" />
+                <label asp-for="VernacularName"></label>
+                <input asp-for="VernacularName" />
                 <span asp-validation-for="VernacularName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ParentGuid" class="control-label"></label>
-                <select asp-for="ParentGuid" class ="form-control" asp-items="ViewBag.ParentGuid"></select>
+                @await Component.InvokeAsync("HierarchyCombobox", RankInput)
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                @await Component.InvokeAsync("HierarchyCombobox", ParentInput)
+            </div>
+           <div class="row">
+                <div class="form-group">
+                    <button type="submit">Сохранить</button>
+                </div>
+                <div class="ml-2">
+                    <a asp-action="Index">Назад</a>
+                </div>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

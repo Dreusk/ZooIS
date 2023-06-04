@@ -1,15 +1,4 @@
-﻿.paging {
-    width: fit-content;
-    border-radius: 9px;
-    margin-bottom: 0.5rem;
-}
-
-.paging input {
-    width: 4em;
-    overflow: hidden;
-}
-
-.card.animal.animated {
+﻿.card.animal.animated {
     transform: translate(0%, -1000%);
     animation: 0s ease-in 0s FlyIn;
     box-shadow: 0px 0.5rem 1rem grey;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿    using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,6 +17,7 @@ using ZooIS.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.CodeAnalysis;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ZooIS.Controllers
 {
@@ -55,18 +56,19 @@ namespace ZooIS.Controllers
 
         [Ignore]
         [HttpGet]
-        public async Task<List<Ref<Animal>>> getRefs(string? q, Guid? species, int page = 1)
+        public async Task<List<AnimalRef>> getRefs(string? q, Guid? species, int page = 1, Guid? id = null)
         {
-            return (await get(q, species, page))
-                .Select(e => new Ref<Animal>(e))
+            return (await get(q, species, page, id))
+                .Select(e => new AnimalRef(e))
                 .ToList();
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? q, Guid? species)
+        public async Task<IActionResult> Index(string? q, int page = 1, Guid? species = null)
         {
             Taxon? rootTaxon = species is null ? null :
                 await _context.Taxons.FindAsync(species);
+            ViewData["Page"] = page;
             ViewData["Params"] = new Dictionary<string, IEntity>
             {
                 { "Вид", rootTaxon }
@@ -78,9 +80,7 @@ namespace ZooIS.Controllers
         public async Task<IActionResult> Show(Guid? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var animal = await _context.Animals
                 .Include(a => a.Species)
@@ -88,9 +88,7 @@ namespace ZooIS.Controllers
                 .Include(a => a.Children)
                 .FirstOrDefaultAsync(m => m.Guid == id);
             if (animal == null)
-            {
                 return NotFound();
-            }
 
             return View(animal);
         }
@@ -103,6 +101,8 @@ namespace ZooIS.Controllers
                 .Include(e => e.Parents)
                 .FirstAsync(e => e.Guid == id)
                 : null;
+            if (id is not null && Animal is null)
+                return NotFound();
             ViewBag.SpeciesRef = Animal is not null ? new Ref<IEntity>(Animal?.Species) : null;
             ViewBag.Parents = Animal is not null ? Animal.Parents.Select(e => new Ref<IEntity>(e)).ToList() : null;
             ViewBag.SexRef = Animal is not null ? Animal?.Sex.GetRef() : null;

@@ -1,0 +1,33 @@
+﻿@model Role?
+
+<h1>Регистрация</h1>
+<h4>Роли</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <input type="hidden" name="Id" id="Id" value="@Model?.Id" />
+            <div class="form-group">
+                <label asp-for="Display" class="required"></label>
+                <input asp-for="Display" />
+                <span asp-validation-for="Display" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                @*<div class="form-group">
+                    <button type="submit">Сохранить</button>
+                </div>*@
+                <div class="ml-2">
+                    <a asp-action="Index">Назад</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

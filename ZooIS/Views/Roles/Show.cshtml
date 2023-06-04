@@ -1,0 +1,36 @@
+﻿@model Role
+
+@{
+    List<Page> AvailablePages = ViewBag.AvailablePages;
+}
+
+<link rel="stylesheet" href="~/css/Show.css" />
+
+<h1>@ViewData["Title"].ToString().Split(" - ").First()</h1>
+<h4>Роли</h4>
+<hr />
+
+<dl>
+    <dt>@Html.DisplayNameFor(model => model.Display)</dt>
+    <dd>@Model.Display</dd>
+
+    <dt>Доступные страницы</dt>
+    <dd>
+        @if (AvailablePages.Count > 0) {
+            <ul>
+                @foreach (Page Page in AvailablePages)
+                {
+                    <li>@Page.Display</li>
+                }
+            </ul>
+        }
+        else {
+            <span class="text-muted">Отсутствуют</span>
+        }
+    </dd>
+</dl>
+<div class="mt-2">
+    <a class="btn" asp-action="Crud" asp-route-id="@Model.Key">
+        Изменить
+    </a>
+</div>

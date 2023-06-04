@@ -38,13 +38,61 @@ namespace ZooIS.Controllers
 
         [HttpGet]
         [Ignore]
-        public async Task<List<Role>> get(string? q)
+        public async Task<List<Role>> get(string? q, int page = 1, string? id = null)
         {
+            const int count = 20;
+            if (id is not null)
+                return new() { await _context.Roles.FindAsync(id) };
             q = q?.ToLower();
             return await _context.Roles.AsQueryable()
-                .Where(e => q == null || e.Name.ToLower().Contains(q))
-                .OrderBy(e => e.Name)
+                .Where(e => q == null || (e.Name + e.Display).ToLower().Contains(q))
+                .OrderBy(e => e.Display)
+                .Skip((page - 1) * count)
+                .Take(count)
                 .ToListAsync();
+        }
+
+        [HttpGet]
+        [Ignore]
+        public async Task<List<Ref<Role>>> getRefs(string? q, int page = 1, string? id = null)
+        {
+            return (await get(q, page, id))
+                .Select(e => new Ref<Role>(e))
+                .ToList();
+        }
+
+        [HttpGet]
+        public IActionResult Index(string? q, int page = 1)
+        {
+            ViewData["Page"] = page;
+            ViewData["Params"] = new Dictionary<string, IEntity>
+            {
+            };
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Show(string? id)
+        {
+            if (id == null)
+                return NotFound();
+            Role role = await _context.Roles
+                .FirstAsync(e => e.Id == id);
+            if (role is null)
+                return NotFound();
+            ViewBag.AvailablePages = Page.PagesForRole(role.Name);
+            return View(role);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Crud(string? id)
+        {
+            Role? role = id != null ? await _context.Roles
+                .FirstOrDefaultAsync(e => e.Id == id)
+                : null;
+            if (id is not null && role is null)
+                return NotFound();
+            return View(role);
         }
     }
 }

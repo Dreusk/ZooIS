@@ -36,7 +36,7 @@ namespace ZooIS.Models
     public class Taxon : Entity
     {
         [MaxLength(100)]
-        [Required]
+        [Required(ErrorMessage ="Обязательное поле")]
         [Display(Name = "Научное название")]
         public string ScientificName { get; set; }
         /// <summary>
@@ -69,7 +69,7 @@ namespace ZooIS.Models
         {
             TaxonRank CurrentLevel = Rank;
             HashSet<Taxon> Species = new() { this };
-			//What is this shit?!
+			//WTF is this?!
             while (CurrentLevel > TaxonRank.Species)
             {
                 await context.Taxons.AsQueryable()
@@ -92,6 +92,23 @@ namespace ZooIS.Models
                     .FirstOrDefaultAsync(e => e.Guid == tmp.ParentGuid);
             }
             return tmp;
+        }
+    }
+
+    public class TaxonRef : Ref<Taxon>
+    {
+        [Display(Name = "Предметы")]
+        public List<TaxonRef> Items { get; set; }
+        [Display(Name = "Искомый?")]
+        public bool isSearched { get; set; } = false;
+
+        public TaxonRef(Taxon Taxon, string? q = null) : base(Taxon)
+        {
+            isSearched = q != null && Taxon.VernacularName.ToLower().Contains(q);
+            Items = Taxon.Taxons
+                .OrderBy(e => e.VernacularName)
+                .Select(e => new TaxonRef(e, q))
+                .ToList();
         }
     }
 
@@ -194,4 +211,21 @@ namespace ZooIS.Models
 
         public CharacterTag(): base() { }
 	}
+
+    [Display(Name ="Животное")]
+    public class AnimalRef: Ref<Animal>
+    {
+        [Display(Name="Вид")]
+        public Ref<Taxon> Species { get; set; }
+        [MaxLength(255)]
+        [Display(Name = "Путь до фото")]
+        public string? PicturePath { get; set; }
+
+
+        public AnimalRef(Animal Animal): base(Animal)
+        {
+            this.PicturePath = Animal.PicturePath;
+            this.Species = new Ref<Taxon>(Animal.Species);
+        }
+    }
 }

@@ -12,7 +12,7 @@
         Name = "Species",
         Placeholder = "Выберите вид...",
         Value = SpeciesRef is not null ? new() { SpeciesRef } : new(),
-        Url = "/Taxons/get_hierarchy",
+        Url = "/Taxons/getHierarchy",
         SearchParams = new() {
             { "level", TaxonRank.Family }
         }

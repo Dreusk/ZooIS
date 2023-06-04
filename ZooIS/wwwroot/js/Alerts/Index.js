@@ -24,4 +24,4 @@
     }
 
 component_did_mount();
-}).call();
+}).call(this);

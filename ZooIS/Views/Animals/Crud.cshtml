@@ -18,7 +18,7 @@
         Name = "Species",
         Placeholder = "Выберите вид …",
         Value = SpeciesRef is not null ? new() { SpeciesRef } : new(),
-        Url = "/Taxons/get_hierarchy",
+        Url = "/Taxons/getHierarchy",
         SearchParams = new()
         {
             { "level", TaxonRank.Species }
@@ -63,9 +63,9 @@
 <script defer src="/js/Animal/Crud.js"></script>
 
 <h1>Регистрация</h1>
-
 <h4>Животного</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Crud" method="POST" enctype="multipart/form-data">

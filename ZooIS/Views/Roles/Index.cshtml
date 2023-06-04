@@ -1,0 +1,19 @@
+﻿@using ZooIS.Components;
+
+<link rel="stylesheet" href="~/css/Index.css" />
+<link rel="stylesheet" href="~/css/Roles/Index.css" />
+<script defer src="~/js/Roles/Index.js"></script>
+
+<div class="flex-row">
+    <h1>
+        @ViewData["Title"].ToString()
+        @*<a asp-action="Crud" class="ml-2" title="Зарегистрировать новое">+</a>*@
+    </h1>
+</div>
+
+@await Component.InvokeAsync("IndexSearch", "Partial/_SearchForm")
+
+<div class="list">
+</div>
+
+@await Component.InvokeAsync("Infinite", new Infinite.Params { Url = "/Roles/getRefs" })

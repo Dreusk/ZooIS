@@ -11,7 +11,7 @@ namespace ZooIS.Components
         public IViewComponentResult Invoke()
         {
             List<string> UserRoles = UserClaimsPrincipal.Claims.Where(e => e.Type == ClaimTypes.Role).Select(e => e.Value).ToList();
-            List<Page> Pages = Page.AllPages.Where(page => page.VisibleFor.Any(role => UserRoles.Contains(role))).ToList();
+            List<Page> Pages = UserRoles.SelectMany(role => Page.PagesForRole(role)).ToList();
             return View("Default", Pages);
         }
     }

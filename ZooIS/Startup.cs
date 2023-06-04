@@ -79,6 +79,7 @@ namespace ZooIS
             });
 
             services.AddRazorPages();
+            services.AddScoped<IInitializer, Initializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

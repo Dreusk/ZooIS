@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ZooIS.Data;
 using ZooIS.Models;
@@ -23,166 +27,85 @@ namespace ZooIS.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        [Ignore]
+        public async Task<List<Taxon>> get(string? q, int page = 1, TaxonRank Rank = TaxonRank.Species, Guid? taxon = null, string? id = null)
         {
-            var zooISContext = _context.Taxons.Include(t => t.Parent);
-            return View(await zooISContext.ToListAsync());
+            const int count = 20;
+            if (id is not null)
+                return new() { await _context.Taxons.FindAsync(id) };
+            q = q?.ToLower();
+            return await _context.Taxons.AsQueryable()
+                .Where(e => e.Rank == Rank && q == null || (e.ScientificName + e.VernacularName).ToLower().Contains(q))
+                .OrderBy(e => e.VernacularName)
+                .Skip((page - 1) * count)
+                .Take(count)
+                .ToListAsync();
         }
 
         [HttpGet]
-        public async Task<IActionResult> Show(Guid? id)
+        [Ignore]
+        public async Task<List<TaxonRef>> getRefs(string? q, int page = 1, TaxonRank Rank = TaxonRank.Species, Guid? taxon = null, string? id = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var taxon = await _context.Taxons
-                .Include(t => t.Parent)
-                .FirstOrDefaultAsync(m => m.Guid == id);
-            if (taxon == null)
-            {
-                return NotFound();
-            }
-
-            return View(taxon);
+            return (await get(q, page, Rank, taxon, id))
+                .Select(e => new TaxonRef(e))
+                .ToList();
         }
 
         [HttpGet]
-        public IActionResult Crud()
+        [Ignore]
+        public async Task<List<TaxonRef>> get_offByOne(string? q, int page = 1, TaxonRank Rank = TaxonRank.Species, Guid? taxon = null, string? id = null)
         {
-            ViewData["ParentGuid"] = new SelectList(_context.Taxons, "Guid", "ScientificName");
-            return View();
+            return await getRefs(q, page, Rank + 1, taxon, id);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Crud([Bind("ScientificName,VernacularName,ParentGuid,Guid")] Taxon taxon)
+        [HttpGet]
+        [Ignore]
+        public async Task<List<Taxon>> getSpecies(string? q, int page = 1, Guid? taxon = null, string? id = null)
         {
-            if (ModelState.IsValid)
+            const int count = 20;
+            if (id is not null)
+                return new() { await _context.Taxons.FindAsync(id) };
+            Taxon? rootTaxon = taxon is null ? null :
+                await _context.Taxons.FindAsync(taxon);
+            q = q?.ToLower();
+            if (rootTaxon is null)
             {
-                taxon.Guid = Guid.NewGuid();
-                _context.Add(taxon);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ParentGuid"] = new SelectList(_context.Taxons, "Guid", "ScientificName", taxon.ParentGuid);
-            return View(taxon);
-        }
-
-        // GET: Taxons/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var taxon = await _context.Taxons.FindAsync(id);
-            if (taxon == null)
-            {
-                return NotFound();
-            }
-            ViewData["ParentGuid"] = new SelectList(_context.Taxons, "Guid", "ScientificName", taxon.ParentGuid);
-            return View(taxon);
-        }
-
-        // POST: Taxons/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("ScientificName,VernacularName,ParentGuid,Guid")] Taxon taxon)
-        {
-            if (id != taxon.Guid)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(taxon);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TaxonExists(taxon.Guid))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ParentGuid"] = new SelectList(_context.Taxons, "Guid", "ScientificName", taxon.ParentGuid);
-            return View(taxon);
-        }
-
-        // GET: Taxons/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var taxon = await _context.Taxons
-                .Include(t => t.Parent)
-                .FirstOrDefaultAsync(m => m.Guid == id);
-            if (taxon == null)
-            {
-                return NotFound();
-            }
-
-            return View(taxon);
-        }
-
-        // POST: Taxons/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var taxon = await _context.Taxons.FindAsync(id);
-            _context.Taxons.Remove(taxon);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool TaxonExists(Guid id)
-        {
-            return _context.Taxons.Any(e => e.Guid == id);
-        }
-
-        public class Hierarchy : Ref<Taxon>
-        {
-            [Display(Name = "Предметы")]
-            public List<Hierarchy> Items { get; set; }
-            [Display(Name = "Искомый?")]
-            public bool isSearched { get; set; } = false;
-
-            public Hierarchy(Taxon Taxon, string? q = null) : base(Taxon)
-            {
-                isSearched = q != null && Taxon.VernacularName.ToLower().Contains(q);
-                Items = Taxon.Taxons
+                return await _context.Taxons.AsQueryable()
+                    .Where(e => e.Rank == TaxonRank.Species && q == null || (e.ScientificName + e.VernacularName).ToLower().Contains(q))
                     .OrderBy(e => e.VernacularName)
-                    .Select(e => new Hierarchy(e, q))
+                    .Skip((page - 1) * count)
+                    .Take(count)
+                    .ToListAsync();
+            }
+            else
+            {
+                return (await rootTaxon.GetSpecies(_context))
+                    .Where(e => q == null || (e.ScientificName + e.VernacularName).ToLower().Contains(q))
+                    .OrderBy(e => e.VernacularName)
+                    .Skip((page - 1) * count)
+                    .Take(count)
                     .ToList();
             }
         }
 
         [HttpGet]
-        [Display(Name = "Иерархия")]
         [Ignore]
-        public async Task<List<Hierarchy>> get_hierarchy(string? q, TaxonRank level = TaxonRank.Species)
+        public async Task<List<Ref<Taxon>>> getSpeciesRefs(string? q, int page = 1, Guid? taxon = null, string? id = null)
+        {
+            return (await getSpecies(q, page, taxon, id))
+                .Select(e => new Ref<Taxon>(e))
+                .ToList();
+        }
+
+        [HttpGet]
+        [Ignore]
+        public async Task<List<TaxonRef>> getHierarchy(string? q, TaxonRank level = TaxonRank.Species, int? depth = null)
         {
             q = q?.ToLower();
             var SearchedItems = await _context.Taxons.AsQueryable()
-                .Where(e => e.Rank <= level && (q == null || e.VernacularName.ToLower().Contains(q)))
+                .Where(e => e.Rank <= level &&
+                    depth == null ? true : e.Rank >= level + depth &&
+                    (q == null || e.VernacularName.ToLower().Contains(q)))
                 .ToListAsync();
             HashSet<Taxon> HighestParents = new();
             foreach (var Taxon in SearchedItems)
@@ -191,8 +114,100 @@ namespace ZooIS.Controllers
                 .Where(e => HighestParents.Select(e => e.Guid).Contains(e.Guid))
                 .Include(e => e.Taxons)
                 .ToListAsync())
-                .Select(e => new Hierarchy(e, q))
+                .Select(e => new TaxonRef(e, q))
                 .ToList();
+        }
+
+        [HttpGet]
+        [Ignore]
+        public async Task<List<Taxon>?> taxon_getHierarchy(Guid? rootTaxon)
+        {
+            List<Taxon> Result = new();
+            if (rootTaxon is null)
+                return null;
+            using (SqlConnection Connection = new(_context.Database.GetConnectionString()))
+            {
+                Connection.Open();
+                using (SqlCommand Procedure = new($"exec taxon_GetHierarchy '{rootTaxon}'", Connection))
+                {
+                    using (SqlDataReader Query = await Procedure.ExecuteReaderAsync(CommandBehavior.CloseConnection))
+                    {
+                        while (await Query.ReadAsync())
+                        {
+                            Taxon tmp = new();
+                            tmp.Guid = (Guid)Query["Guid"];
+                            tmp.ScientificName = (string)Query["ScientificName"];
+                            tmp.VernacularName = (string)Query["VernacularName"];
+                            tmp.Rank = (TaxonRank)Query["Rank"];
+                            Result.Add(tmp);
+                        }
+                    }
+                }
+            }
+            return Result;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string? q, int page = 1, Guid? taxon = null)
+        {
+            Taxon? rootTaxon = taxon is null ? null :
+                await _context.Taxons.FindAsync(taxon);
+            ViewData["Page"] = page;
+            ViewData["Params"] = new Dictionary<string, IEntity>
+            {
+                { "Таксон", rootTaxon }
+            };
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Show(Guid? id)
+        {
+            if (id == null)
+                return NotFound();
+            Taxon taxon = await _context.Taxons
+                .FirstOrDefaultAsync(e => e.Guid == id);
+            if (taxon is null)
+                return NotFound();
+            ViewBag.Hierarchy = await taxon_getHierarchy(taxon.Guid);
+            return View(taxon);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Crud(Guid? id)
+        {
+            Taxon? taxon = id != null ? await _context.Taxons
+                .Include(e => e.Parent)
+                .FirstOrDefaultAsync(e => e.Guid == id)
+                : null;
+            if (id is not null && taxon is null)
+                return NotFound();
+            ViewBag.ParentRef = taxon?.Parent is not null ? new Ref<IEntity>(taxon.Parent) : null;
+            ViewBag.RankRef = taxon is not null ? taxon?.Rank.GetRef() : null;
+            ViewBag.Ranks = Enum.GetValues<TaxonRank>().OrderByDescending(e => e).Select(E => E.GetRef()).ToList();
+            return View(taxon);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Crud()
+        {
+            Taxon taxon = new();
+            var Form = Request.Form;
+            if (Form["Id"] != "")
+                taxon = await _context.Taxons
+                    .FirstOrDefaultAsync(e => e.Guid == new Guid(Form["Id"].ToString()));
+            taxon.ScientificName = Form["ScientificName"];
+            taxon.VernacularName = Form["VernacularName"];
+            taxon.Rank = Enum.Parse<TaxonRank>(Form["Rank"].ToString());
+            Guid? parentGuid = new(Form["Parent"]);
+            taxon.Parent = parentGuid is not null ? await _context.Taxons.FindAsync(new Guid(Form["Parent"].ToString())) : null;
+            TryValidateModel(taxon);
+            if (!ModelState.IsValid)
+            {
+                return View(taxon);
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Show", "Taxons", new { id = taxon.Guid });
         }
     }
 }

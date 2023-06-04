@@ -1,8 +1,8 @@
-﻿@model IEnumerable<User>
+﻿@using ZooIS.Components;
 
-@{
-    int Page = (int)ViewData["Page"];
-}
+<link rel="stylesheet" href="~/css/Index.css" />
+<link rel="stylesheet" href="~/css/Users/Index.css" />
+<script defer src="~/js/Users/Index.js"></script>
 
 <div class="flex-row">
     <h1>
@@ -13,9 +13,7 @@
 
 @await Component.InvokeAsync("IndexSearch", "Partial/_SearchForm")
 
-@foreach (User item in Model)
-{
-    <a class="text-inherit" asp-action="Show" asp-route-id="@item.Id">
-        <div class="card">@item.UserName</div>
-    </a>
-}
+<div class="list">
+</div>
+
+@await Component.InvokeAsync("Infinite", new Infinite.Params { Url = "/Users/getRefs" })

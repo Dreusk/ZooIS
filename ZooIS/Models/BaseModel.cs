@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZooIS.Data;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Humanizer;
 
 namespace ZooIS.Models
 {
@@ -93,15 +94,19 @@ namespace ZooIS.Models
         [Display(Name = "Сущность - перечисление")]
         public class EEnum : IEntity
         {
-            private Enum _Value { get; set; } = null;
-            private string _Display { get => _Value.GetDisplay(); }
+            private object _Value;
+            private string _Display;
             public object Key { get => _Value; }
 
             public string Display { get => _Display; }
 
             public EEnum() { }
 
-            public EEnum(Enum Enum) => _Value = Enum;
+            public EEnum(Enum Enum)
+            {
+                _Value = Enum.GetValue();
+                _Display = Enum.GetDisplay();
+            }
         }
     }
 

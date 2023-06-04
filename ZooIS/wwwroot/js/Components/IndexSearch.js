@@ -25,9 +25,9 @@ function activate_fn(isActive) {
 
 function expand_fn(isExpanded) {
 	if (isExpanded)
-        root.insertBefore(expand_block, root.children[1]);
+        expand_block.style["display"] = "block"
     else
-        expand_block.remove();
+        expand_block.style["display"] = "none"
 }
 
 function clear_fn() {
@@ -49,8 +49,8 @@ function component_did_mount() {
     }).call(null, root.querySelector(".search input"));
     
     (function(el) {
-        el.onclick = () => clear_fn;
-        el.onkeydown = (ev) => { if (ev.keyCode == 13) clear_fn };
+        el.onclick = () => clear_fn();
+        el.onkeydown = (ev) => { if (ev.keyCode == 13) clear_fn() };
     }).call(null, root.querySelector(".search .clear"));
     
     (function(el) {

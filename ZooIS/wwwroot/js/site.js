@@ -5,12 +5,10 @@
     constructor(value){
         this.#Value = value;
     }
-
-    Subscribe(fn) {
-        this.#Subscriptions.push(fn);
-		fn(this.#Value);
-    }
 	
+    /**
+     * Re-runs all functions stored in #Subscriptions.
+     */
 	#RenderState() {
 		this.#Subscriptions.forEach(sub => {
             sub(this.#Value);
@@ -22,6 +20,11 @@
     */
     Globalize(key) {
         window.state[key] = this.#Value;
+    }
+
+    Subscribe(fn) {
+        this.#Subscriptions.push(fn);
+		fn(this.#Value);
     }
 
     /**

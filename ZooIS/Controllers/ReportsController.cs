@@ -26,8 +26,8 @@ namespace ZooIS.Controllers
 	[Display(Name = "Отчеты")]
 	public class ReportsController : Controller
 	{
-		private readonly IEnumerable<Concept<ReportType>> Reports = Enum.GetValues<ReportType>()
-			.Select(e => (Concept<ReportType>)e);
+		private readonly IEnumerable<Ref<IEntity>> Reports = Enum.GetValues<ReportType>()
+			.Select(e => e.GetRef());
 
 		private readonly ZooISContext _context;
 
@@ -112,11 +112,12 @@ namespace ZooIS.Controllers
 
 		[Ignore]
 		[HttpGet]
-		public IEnumerable<Concept<ReportType>> getTypes(string? q) {
+		public List<Ref<IEntity>> getTypes(string? q) {
 			q = q?.ToLower();
 			return Reports
 				.Where(e => q == null || e.Display.ToLower().Contains(q))
-				.OrderBy(e => e.Display);
+				.OrderBy(e => e.Display)
+				.ToList();
 		}
 
 		[Ignore]

@@ -20,12 +20,13 @@
     string NoPicturePath = "/static/NoPhoto.png";
 }
 
-<link rel="stylesheet" href="~/css/Animals/Show.css" />
+<link rel="stylesheet" href="~/css/Show.css" />
 
 <h1>@ViewData["Title"].ToString().Split(" - ").First()</h1>
+<h4>Животного</h4>
+<hr />
 
 <div>
-    <hr />
     <h4>@Model.Name</h4>
     <img src="@(Model.PicturePath ?? NoPicturePath)" title="@Model.Display" />
     <dl>
@@ -40,7 +41,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td class="pr-3">
                             <a asp-controller="Taxons" asp-action="Show" asp-route-id="@Model.Species.Key">
                                 @Model.Species.Display
                             </a>

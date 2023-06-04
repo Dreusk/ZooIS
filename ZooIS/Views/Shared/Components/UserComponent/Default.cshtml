@@ -14,7 +14,7 @@
     @if (isDebug)
     {
         <div tabindex="0" class="trigger">
-            <span class="nav-link text-dark">@Model?.Display</span>
+            <span class="nav-link text-dark">@(Model?.Employee?.Display ?? Model?.Display ?? "???")</span>
         </div>
         <div class="expand-block">
             <ul>

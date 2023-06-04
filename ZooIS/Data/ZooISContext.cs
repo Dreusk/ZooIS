@@ -29,6 +29,8 @@ namespace ZooIS.Data
         {
             base.OnModelCreating(builder);
             builder.Entity<Animal>().HasCheckConstraint("BirthDate_NoFuture", "BirthDate <= CURRENT_TIMESTAMP");
+            builder.Entity<IdentityUserRole<string>>()
+                .ToTable("AspNetUserRoles");
         }
     }
 }

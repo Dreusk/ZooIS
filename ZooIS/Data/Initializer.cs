@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,58 +14,88 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ZooIS.Data
 {
-	/// <summary>
-	/// Contains extension for UserManager and RoleManager.
-	/// </summary>
-	public static class ManagersExtension
+    /// <summary>
+    /// Contains extension used for Identity.
+    /// </summary>
+    public static class ManagersExtension
+    {
+        public async static Task<IdentityResult> AddUserToRole<TUser>(this UserManager<TUser> userManager, ZooISContext context, string UserName, Role Role) where TUser : class
+        {
+            (await context.Users.FirstAsync(e => e.UserName == UserName)).Roles.Add(Role);
+            await context.SaveChangesAsync();
+            return IdentityResult.Success;
+        }
+
+        public async static Task<IdentityResult> AddUserToRole<TUser>(this UserManager<TUser> userManager, ZooISContext context, string UserName, string Role) where TUser : class
+        {
+            (await context.Users.FirstAsync(e => e.UserName == UserName)).Roles.Add(await context.Roles.FirstAsync(e => e.Name == Role));
+            await context.SaveChangesAsync();
+			return IdentityResult.Success;
+        }
+
+        public async static Task<IdentityResult> AddUserToRoles<TUser>(this UserManager<TUser> userManager, ZooISContext context, string UserName, IEnumerable<Role> Roles) where TUser : class
+        {
+			User user = await context.Users.FirstAsync(e => e.UserName == UserName);
+			user.Roles = Roles.ToHashSet();
+			await context.SaveChangesAsync();
+            return IdentityResult.Success;
+        }
+    }
+
+	public interface IInitializer
 	{
-		public async static Task<IdentityResult> AddUserToRole<TUser>(this UserManager<TUser> userManager, string UserName, string Role) where TUser : class
+		public Task Initialize();
+
+    }
+
+    public class Initializer: IInitializer
+	{
+        private enum Modules
+        {
+            [Display(Name = "Авторизациия")]
+            Identity,
+            [Display(Name = "База данных")]
+            Database,
+            [Display(Name = "Нет")]
+            None
+        };
+
+        private readonly IConfiguration configuration;
+		private readonly ZooISContext context;
+		private readonly UserManager<User> userManager;
+		private readonly RoleManager<Role> roleManager;
+
+        private readonly Modules Initialization;
+
+        public Initializer(IConfiguration configuration, ZooISContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
 		{
-			return await userManager.AddToRoleAsync(await userManager.FindByNameAsync(UserName), Role);
+			this.configuration = configuration;
+			this.context = context;
+			this.userManager = userManager;
+			this.roleManager = roleManager;
+
+			if (!Enum.TryParse<Modules>(configuration.GetSection("Initializer")["Module"], true, out Initialization))
+				Initialization = Modules.None;
 		}
 
-		public async static Task<IdentityResult> AddUserToRoles<TUser>(this UserManager<TUser> userManager, string UserName, IQueryable<Role> Roles) where TUser : class
-		{
-			return await userManager.AddToRolesAsync(await userManager.FindByNameAsync(UserName), (await Roles.ToListAsync()).Select(e => e.Name));
-		}
-	}
-	public static class Initializer
-	{
-		private enum Modules
-		{
-			[Display(Name = "Авторизациия")]
-			Identity,
-			[Display(Name = "База данных")]
-			Database,
-			[Display(Name = "Нет")]
-			None
-		};
-
-		private static readonly Modules Initialization = Modules.None;
-
-		public static async Task InitializeIdentity(IServiceProvider services)
+		private async Task InitializeIdentity()
 		{
 			if (Initialization != Modules.Identity)
 				return;
 
-			using (var context = new ZooISContext(services.GetRequiredService<DbContextOptions<ZooISContext>>()))
-			{
-				//Clear identities
-				context.Logs.RemoveRange(context.Logs);
-				context.Alerts.RemoveRange(context.Alerts);
-				context.UserClaims.RemoveRange(context.UserClaims);
-				context.UserTokens.RemoveRange(context.UserTokens);
-				context.UserLogins.RemoveRange(context.UserLogins);
-				context.UserRoles.RemoveRange(context.UserRoles);
-				context.RoleClaims.RemoveRange(context.RoleClaims);
-				context.Employees.RemoveRange(context.Employees);
-				context.Users.RemoveRange(context.Users);
-				context.Roles.RemoveRange(context.Roles);
-				await context.SaveChangesAsync();
-			}
+			//Clear identities
+			context.Logs.RemoveRange(context.Logs);
+			context.Alerts.RemoveRange(context.Alerts);
+			context.UserClaims.RemoveRange(context.UserClaims);
+			context.UserTokens.RemoveRange(context.UserTokens);
+			context.UserLogins.RemoveRange(context.UserLogins);
+			context.UserRoles.RemoveRange(context.UserRoles);
+			context.RoleClaims.RemoveRange(context.RoleClaims);
+			context.Employees.RemoveRange(context.Employees);
+			context.Users.RemoveRange(context.Users);
+			context.Roles.RemoveRange(context.Roles);
+			await context.SaveChangesAsync();
 
-			var userManager = services.GetRequiredService<UserManager<User>>();
-			var roleManager = services.GetRequiredService<RoleManager<Role>>();
 			var Results = new HashSet<IdentityResult>();
 			Results.UnionWith(new HashSet<IdentityResult>() {
 				await userManager.CreateAsync(new User
@@ -137,11 +168,11 @@ namespace ZooIS.Data
 				throw E;
 			}
 			Results = new() {
-					await userManager.AddUserToRole("i-ivanov", "Caretaker"),
-					await userManager.AddUserToRole("e-evanov", "Doctor"),
-					await userManager.AddUserToRole("a-avanov", "Zootechnician"),
-					await userManager.AddUserToRole("admin", "Admin"),
-					await userManager.AddUserToRoles("test", roleManager.Roles.Where(e => e.Name != "Backend")) };
+					await userManager.AddUserToRole(context, "i-ivanov", "Caretaker"),
+					await userManager.AddUserToRole(context, "e-evanov", "Doctor"),
+					await userManager.AddUserToRole(context, "a-avanov", "Zootechnician"),
+					await userManager.AddUserToRole(context, "admin", "Admin"),
+					await userManager.AddUserToRoles(context, "test", context.Roles.Where(e => e.Name != "Backend")) };
 			if (Results.Any(task => !task.Succeeded))
 			{
 				var E = new Exception("Something gone wrong");
@@ -149,41 +180,38 @@ namespace ZooIS.Data
 				throw E;
 			}
 
-			using (var context = new ZooISContext(services.GetRequiredService<DbContextOptions<ZooISContext>>()))
-			{
-				context.Employees.AddRange(
-					new Employee
+			context.Employees.AddRange(
+				new Employee
+				{
+					UserId = (await userManager.FindByNameAsync("i-ivanov")).Id,
+					Name = new()
 					{
-						UserId = (await userManager.FindByNameAsync("i-ivanov")).Id,
-						Name = new()
-						{
-							GivenName = "Иван",
-							FamilyName = "Иванов"
-						}
-					},
-					new Employee
+						GivenName = "Иван",
+						FamilyName = "Иванов"
+					}
+				},
+				new Employee
+				{
+					UserId = (await userManager.FindByNameAsync("e-evanov")).Id,
+					Name = new()
 					{
-						UserId = (await userManager.FindByNameAsync("e-evanov")).Id,
-						Name = new()
-						{
-							GivenName = "Еван",
-							FamilyName = "Еванов"
-						}
-					},
-					new Employee
+						GivenName = "Еван",
+						FamilyName = "Еванов"
+					}
+				},
+				new Employee
+				{
+					UserId = (await userManager.FindByNameAsync("a-avanov")).Id,
+					Name = new()
 					{
-						UserId = (await userManager.FindByNameAsync("a-avanov")).Id,
-						Name = new()
-						{
-							GivenName = "Аван",
-							FamilyName = "Аванов"
-						}
-					});
-				await context.SaveChangesAsync();
-			}
+						GivenName = "Аван",
+						FamilyName = "Аванов"
+					}
+				});
+			await context.SaveChangesAsync();
 		}
 
-		public static async Task InitTaxons(ZooISContext context)
+		private async Task InitTaxons(ZooISContext context)
 		{
 			//Life
 			context.Taxons.AddRange(
@@ -313,11 +341,10 @@ namespace ZooIS.Data
 			await context.SaveChangesAsync();
 		}
 
-		public static async Task InitializeDatabase(IServiceProvider services)
+		private async Task InitializeDatabase()
 		{
 			if (Initialization != Modules.Database)
 				return;
-			var context = new ZooISContext(services.GetRequiredService<DbContextOptions<ZooISContext>>());
 			//Clear entities
 			context.Alerts.RemoveRange(context.Alerts);
 			(await context.Animals.Include(e => e.Children).ToListAsync()).ForEach(e =>
@@ -382,6 +409,7 @@ namespace ZooIS.Data
 			context.Alerts.AddRange(
 				new Alert
 				{
+					Url = "",
 					Level = AlertLevel.Regular,
 					Type = AlertType.Info,
 					Message = "Тестовое сообщение",
@@ -389,14 +417,16 @@ namespace ZooIS.Data
 				},
 				new Alert
 				{
-					Level = AlertLevel.Warning,
+                    Url = "",
+                    Level = AlertLevel.Warning,
 					Type = AlertType.Success,
 					Message = "Тестовое сообщение",
 					User = User
 				},
 				new Alert
 				{
-					Level = AlertLevel.Alert,
+                    Url = "",
+                    Level = AlertLevel.Alert,
 					Type = AlertType.Fail,
 					Message = "Тестовое сообщение",
 					User = User
@@ -404,15 +434,15 @@ namespace ZooIS.Data
 			await context.SaveChangesAsync();
 		}
 
-		public static async Task Initialize(IServiceProvider services)
+		public async Task Initialize()
 		{
 			switch (Initialization)
 			{
 				case Modules.Database:
-					await InitializeDatabase(services);
+					await InitializeDatabase();
 					break;
 				case Modules.Identity:
-					await InitializeIdentity(services);
+					await InitializeIdentity();
 					break;
 			}
 		}

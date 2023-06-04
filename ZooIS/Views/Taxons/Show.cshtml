@@ -1,36 +1,52 @@
-﻿@model ZooIS.Models.Taxon
+﻿@model Taxon
+
+@using ZooIS.Data
 
 @{
-    ViewData["Title"] = "Details";
+    List<Taxon> Classification = ViewBag.Hierarchy;
 }
 
-<h1>Details</h1>
+<link rel="stylesheet" href="~/css/Show.css" />
 
-<div>
-    <h4>Taxon</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ScientificName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ScientificName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.VernacularName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.VernacularName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Parent)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Parent.ScientificName)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Guid">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<h1>@ViewData["Title"].ToString().Split(" - ").First()</h1>
+<h4>Вида</h4>
+<hr />
+
+<dl>
+    <dt>@Html.DisplayNameFor(model => model.VernacularName)</dt>
+    <dd>@Html.DisplayFor(model => model.VernacularName)</dd>
+
+    <dt>@Html.DisplayNameFor(model => model.ScientificName)</dt>
+    <dd> @Html.DisplayFor(model => model.ScientificName)</dd>
+
+    <dt>Классификация</dt>
+    <dd>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ранг</th>
+                    <th>Таксон</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(Taxon taxon in Classification)
+                {
+                    <tr>
+                        <td class="align-top pr-3">
+                            @(taxon.Rank.GetDisplay())
+                        </td>
+                        <td>
+                            <a asp-route-id="@taxon.Guid">@taxon.VernacularName</a>
+                            <div class="text-muted">@taxon.ScientificName</div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </dd>
+</dl>
+<div class="mt-2">
+    <a class="btn" asp-action="Crud" asp-route-id="@Model.Key">
+        Изменить
+    </a>
 </div>

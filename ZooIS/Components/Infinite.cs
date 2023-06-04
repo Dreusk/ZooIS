@@ -12,6 +12,8 @@ namespace ZooIS.Components
             [Required]
             [Display(Name = "Урл")]
             public string Url { get; set; }
+            [Display(Name = "Параметры поиска")]
+            public Dictionary<string, object> SearchParams { get; set; } = new();
         }
 
         public IViewComponentResult Invoke(Params Model)

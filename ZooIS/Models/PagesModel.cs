@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using ZooIS.Data;
 
 namespace ZooIS.Models
@@ -42,9 +43,19 @@ namespace ZooIS.Models
             VisibleFor = new HashSet<string>{"Admin"}
         },
         new(){
+            Controller = "Roles",
+            Display = "Роли",
+            VisibleFor = new HashSet<string>{"Admin"}
+        },
+        new(){
             Controller = "Reports",
             Display = "Отчеты",
             VisibleFor = new HashSet<string>{"Caretaker"}
         }};
+
+        public static List<Page> PagesForRole(string Role)
+        {
+            return Page.AllPages.Where(page => page.VisibleFor.Contains(Role)).ToList();
+        }
     }
 }

@@ -1,47 +1,22 @@
-﻿@model IEnumerable<ZooIS.Models.Taxon>
+﻿@using ZooIS.Components;
 
-@{
-    ViewData["Title"] = "Index";
-}
+<link rel="stylesheet" href="~/css/Index.css" />
+<link rel="stylesheet" href="~/css/Taxons/Index.css" />
+<script defer src="~/js/Taxons/Index.js"></script>
 
-<h1>Index</h1>
+<div class="flex-row">
+    <h1>
+        Виды
+        <a asp-action="Crud" class="ml-2" title="Зарегистрировать новое">+</a>
+    </h1>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ScientificName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.VernacularName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Parent)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.ScientificName)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.VernacularName)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Parent.ScientificName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Guid">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Guid">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Guid">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+@await Component.InvokeAsync("IndexSearch", "Partial/_SearchForm")
+
+<div class="list">
+</div>
+
+@await Component.InvokeAsync("Infinite", new Infinite.Params {
+    Url = "/Taxons/getSpeciesRefs",
+    SearchParams = new() {}
+})

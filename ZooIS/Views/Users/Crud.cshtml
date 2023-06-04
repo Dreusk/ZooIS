@@ -1,0 +1,56 @@
+﻿@model User?
+@using ZooIS.Components
+
+@{
+    List<Ref<IEntity>>? Roles = ViewBag.Roles;
+    HierarchyCombobox.Params RolesInput = new()
+            {
+                Flags = new()
+                {
+                    isMultiselectable = true,
+                    isSearchable = true
+                },
+                Title="Роли",
+                Name = "Roles",
+                Placeholder = "Выберите роли …",
+                Value = Roles ?? new(),
+                Url = "/Roles/get"
+            };
+}
+
+<h1>Регистрация</h1>
+<h4>Пользователя</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <input type="hidden" name="Id" id="Id" value="@Model?.Id" />
+            <div class="form-group">
+                <label asp-for="UserName" class="required"></label>
+                <input asp-for="UserName" readonly="@(Model?.UserName is not null)" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee" class="required"></label>
+                <input name="Employee" id="Employee" value="@Model?.Employee?.Display" readonly="@(Model?.Employee is not null)" />
+            </div>
+            <div class="form-group">
+                @await Component.InvokeAsync("HierarchyCombobox", RolesInput)
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <button type="submit">Сохранить</button>
+                </div>
+                <div class="ml-2">
+                    <a asp-action="Index">Назад</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -34,7 +34,7 @@
 	function window_fn(ev) {
 		if (!root.contains(ev.target))
 			isExpanded.Set(false);
-		}
+	}
 	
 	function window_key_fn(ev) {
 		if (ev.keyCode == 13) {
