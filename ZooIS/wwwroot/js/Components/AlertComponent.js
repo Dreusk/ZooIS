@@ -7,7 +7,7 @@
 
     function lookup() {
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", "Alerts/by_current_user");
+        xhr.open("GET", "/Alerts/by_current_user");
         xhr.responseType = "json";
         xhr.onload = (ev) => xhr_load(ev, lookup_success);
         xhr.onerror = xhr_error;
